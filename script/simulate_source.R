@@ -37,7 +37,7 @@ option_list <- list(
 
 myArgs <- parse_args(
   OptionParser(usage = "%prog [-o output] [-i input] [-h nb_groups] [-n nb_genotypes] [-t threads]",
-  option_list = option_list
+  option_list = option_list)
   )
 
 
