@@ -10,6 +10,7 @@ suppressPackageStartupMessages(library("optparse"))
 library(dplyr)
 library(parallel)
 library(vcfR)
+library(adegenet)
 
 source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
 
