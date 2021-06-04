@@ -68,7 +68,7 @@ nb_genotypes = config['nb_genotypes']
 
 rule simulate_source:
     input: rules.split_source_chrom.output
-    output: expand(os.path.join(outdir, 'source', '{chromosome}', 'group_{k}'), chromosome = wildcards.chromosome, k = k)
+    output: expand(os.path.join(outdir, 'source', '{chromosome}', 'group_{k}'), chromosome = "{chromosome}", k = k)
     params:
         # nb_snps = nb_snps,
         # chrom_length = chrom_length,
@@ -176,7 +176,7 @@ rule elai:
         snp_file = rules.test_file.output.snp_file,
     output:
         # expand(os.path.join(outdir, "batch_{batchid}/output_{elai_params}/elai_r.{elai_ext}"), batchid = "{batchid}", elai_params = "{elai_params}", elai_ext = elai_ext)
-        expand(os.path.join(outdir, "elai", "{chromosome}", "{elai_params}", "elai_r.{elai_ext}"), chromosome=wildcards.chromosome, elai_params = wildcards.elai_params, elai_ext=elai_ext)
+        expand(os.path.join(outdir, "elai", "{chromosome}", "{elai_params}", "elai_r.{elai_ext}"), chromosome= "{chromosome}", elai_params = "{elai_params}", elai_ext=elai_ext)
     params:
         source_files = source_files,
         options = lambda wildcards: config["elai_params"][wildcards.elai_params],
