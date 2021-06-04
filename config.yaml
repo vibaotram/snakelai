@@ -11,7 +11,7 @@
 genome: "/data3/projects/vietcaf/reference/CC1.8_v2_pseudomolecule_cat.fa" # fasta file
 test_vcf: "/data3/projects/vietcaf/baotram/vietcaf_general_DP_missing_indv_singletons_Filtered_biallelic.recode.vcf"
 source_vcf: "/data3/projects/vietcaf/baotram/vietcaf_general_DP_missing_indv_singletons_Filtered_biallelic.recode.vcf"
-genotype_id: "TR6m" # "@" for all genotypes or specific id
+genotype_id: ["TR6m"] # "@" for all genotypes or specific id
 chromosome: "@" # "@" for all chromosome or specific chroms
 
 ####################

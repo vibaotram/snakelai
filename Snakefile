@@ -89,7 +89,7 @@ genotype_id = config['genotype_id']
 if test_vcf == source_vcf:
     test_vcf_reader = source_vcf_reader
 else:
-    test_vcf_reader = vcf.Reader(open(source_vcf, 'r'))
+    test_vcf_reader = vcf.Reader(open(test_vcf, 'r'))
 if not all(id in test_vcf_reader.samples for id in genotype_id):
     raise ValueError("Specified genotype IDs do not present in the test_vcf file")
 
