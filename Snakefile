@@ -90,7 +90,7 @@ rule simulate_source:
     conda: "conda/conda_rmarkdown.yaml"
     shell:
         """
-        Rscript {params.script} {output} {input} {params.nb_groups} {params.nb_genotypes} {threads}
+        Rscript {params.script} -o {output} -i {input} -g {params.nb_groups} -n {params.nb_genotypes} -t {threads}
         """
 
 

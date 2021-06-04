@@ -4,23 +4,46 @@ if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos 
 if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
 if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org")
 if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org")
+if (!requireNamespace("optparse", quietly = TRUE)) install.packages('optparse', repos = "https://cloud.r-project.org")
 
+suppressPackageStartupMessages(library("optparse"))
 library(dplyr)
 library(parallel)
 library(vcfR)
 
 source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
 
-args <- commandArgs(trailingOnly = TRUE)
+option_list <- list(
+  make_option(c("-o", "--output"),
+              type = "character",
+              help = "output files"),
+  make_option(c("-i", "--input"),
+              type = "character",
+              help = "input files"),
+  make_option(c("-g", "--nb_groups"),
+              type = "integer",
+              help = "number of groups"),
+  make_option(c("-n", "--nb_genotypes"),
+              type = "integer",
+              help = "number of genotypes per group"),
+  make_option(c("-t", "--threads"),
+              type = "integer",
+              help = "number of threads")
+)
+
+myArgs <- parse_args(
+  OptionParser(usage = "%prog [-o output] [-i input] [-h nb_groups] [-n nb_genotypes] [-t threads]", 
+  option_list = option_list
+  )
 
 
-out_files <- args[1] #snakemake@output
+out_files <- myArgs$output 
 outdir <- unique(dirname(out_files))
-vcf_file <- args[2] #snakemake@input
-cores <- args[3] #snakemake@threads
+vcf_file <- myArgs$input
+cores <- myArgs$threads 
 # nb_batches = nb_batches
-nb_groups <- args[4] #snakemake@params$nb_groups
-nb_genotypes <- args[5] #snakemake@params$nb_genotypes
+nb_groups <- myArgs$nb_groups 
+nb_genotypes <- myArgs$nb_groups 
 
 
 

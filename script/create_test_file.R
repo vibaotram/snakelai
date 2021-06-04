@@ -15,7 +15,7 @@ args <- commandArgs(trailingOnly = TRUE)
 
 test_file <- args[1] #snakemake@output$test_file
 snp_file <- args[2] #snakemake@output$snp_file
-genotype_id <- args[3] #snakemake@params$genotype_id
+# genotype_id <- args[3] #snakemake@params$genotype_id
 vcf_file <- args[4] #snakemake@input
 
 
@@ -28,7 +28,8 @@ chr_snps$ID <- paste(chr_snps$CHROM, chr_snps$POS, sep = "_")
 chr_geno <- as.matrix(chr_gl)
 chr_geno[is.na(chr_geno)] <- 9
 
-test_geno <- t(chr_geno[genotype_id,])
+# test_geno <- t(chr_geno[genotype_id,])
+test_geno <- t(chr_geno)
 test_gt <- geno2elai_gt(test_geno, chr_snps)
 rownames(test_gt) <- genotype_id
 colnames(test_gt) <- chr_snps$ID
