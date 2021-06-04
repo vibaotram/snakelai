@@ -46,11 +46,14 @@ elif not all(c in source_chromosome for c in chromosome):
 else:
     pass
 
+
+elai_params = list(config["elai_params"].keys())
+
 rule finish:
     input:
         #expand(os.path.join(outdir, "final_results/output_{elai_params}/{files}"), elai_params = elai_params, files = ["overall_admixture.tsv", "local_dosage.tsv"])
         expand(os.path.join(outdir, "elai_results", "{chromosome}", "{elai_params}", "elai_results.html"), chromosome=chromosome, elai_params=elai_params)
-        
+
 rule split_source_chrom:
     input: source_vcf
     output: os.path.join(outdir, 'source', '{chromosome}', '{source_name}_{chromosome}.recode.vcf')
@@ -148,7 +151,6 @@ rule split_snps:
 elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 # source_genotypes = config["source_genotypes"]
 # test_genotype = config["test_genotype"]
-elai_params = list(config["elai_params"].keys())
 elai_ext = ["admix.txt", "em.txt", "log.txt", "ps21.txt", "snpinfo.txt"]
 
 # if random_snps:
