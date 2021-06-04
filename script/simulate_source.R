@@ -93,7 +93,7 @@ n_inds <- nb_genotypes
 n_snps <- nrow(chr_freq)/3
 
 mclapply(1:ncol(chr_freq), function(v) {
-  grp_elai_input <- out_files[v]))
+  grp_elai_input <- out_files[v]
   ind_names <- paste0("group_", colnames(chr_freq)[v], "-", 1:n_inds)
   writeLines(c(n_inds, n_snps, paste(c("ID", ind_names), collapse = ",")), grp_elai_input)
   freq <- chr_freq[,v] # get allele freq of the group

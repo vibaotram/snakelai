@@ -26,7 +26,7 @@ vcf_file <- args[4] #snakemake@input
 
 vcf_R <- read.vcfR(vcf_file)
 chr_gl <- vcfR2genlight(vcf_R, n.cores = cores)
-chr_snps <- <- as.data.frame(getFIX(vcf_R), stringsAsFactors = F)
+chr_snps <- as.data.frame(getFIX(vcf_R), stringsAsFactors = F)
 chr_snps$ID <- paste(chr_snps$CHROM, chr_snps$POS, sep = "_")
 chr_geno <- as.matrix(chr_gl)
 chr_geno[is.na(chr_geno)] <- 9
