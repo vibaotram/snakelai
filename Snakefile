@@ -6,11 +6,6 @@ import re
 
 # configfile: "config.yaml"
 
-rule finish:
-    input:
-        #expand(os.path.join(outdir, "final_results/output_{elai_params}/{files}"), elai_params = elai_params, files = ["overall_admixture.tsv", "local_dosage.tsv"])
-        finish_input
-
 
 def unique_chrom(vcf):
 
@@ -212,17 +207,22 @@ rule elai:
 
 rule read_elai:
     input: expand(rules.elai.output, elai_params = "{elai_params}", elai_ext = ["admix.txt", "ps21.txt"])
-    output: os.path.join(aggregate_outdir, "output_{elai_params}/elai_results.html")
+    output: os.path.join(outdir, "elai_results", "{chromosome}", "{elai_params}", "elai_results.html")
     params:
         elai_options = lambda wildcards: config["elai_params"][wildcards.elai_params],
-        adm_file = os.path.join(aggregate_outdir, "output_{elai_params}/overall_admixture.tsv"),
-        dosage_file = os.path.join(aggregate_outdir, "output_{elai_params}/local_dosage.tsv"),
-        true_dosage_file = config["true_inference"],
+        adm_file = lambda wildcards, output: os.path.join(os.path.dirname(output), "overall_admixture.tsv"),
+        dosage_file = lambda wildcards, output: os.path.join(os.path.dirname(output), "local_dosage.tsv"),
+        # true_dosage_file = config["true_inference"],
         genome_file = config["genome"],
-        logname = "read_elai_{batchid}_{elai_params}" if random_snps else "read_elai_{elai_params}",
+        logname = "read_elai_{chromosome}_{elai_params}",
         logdir = os.path.join(outdir, "log")
     conda: "conda_rmarkdown.yaml"
     script: "script/read_elai.Rmd"
 
 rule test:
     shell: "echo {source_files}"
+
+rule finish:
+    input:
+        #expand(os.path.join(outdir, "final_results/output_{elai_params}/{files}"), elai_params = elai_params, files = ["overall_admixture.tsv", "local_dosage.tsv"])
+        expand(os.path.join(outdir, "elai_results", "{chromosome}", "{elai_params}", "elai_results.html"), chromosome=chromosome, elai_params=elai_params)

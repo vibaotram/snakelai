@@ -134,13 +134,13 @@ for (i in unique(all_dosage$individual)) {
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 true_inference_file <- snakemake@params$true_dosage_file
 print_cor <- file.exists(true_inference_file)
 ```
 
 
-```{r, eval=print_cor}
+```{r, eval=print_cor, eval=FALSE}
 knitr::asis_output("## correlation between estimated inference and true inference\\n")
 for (i in unique(all_dosage$individual)) {
   true_dosage <- data.table::fread(true_inference_file, header = T, sep = "\t", stringsAsFactors = F)
