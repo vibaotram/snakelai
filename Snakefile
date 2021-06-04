@@ -89,7 +89,7 @@ rule simulate_source:
     threads: config['split_snps_cores']
     shell:
     """
-    Rscript {PARAMS.script} {output} {input} {params.nb_groups} {params.nb_genotypes} {threads}
+    Rscript {params.script} {output} {input} {params.nb_groups} {params.nb_genotypes} {threads}
     """
 
 
