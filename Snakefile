@@ -88,9 +88,9 @@ rule simulate_source:
         logdir = os.path.join(outdir, "log")
     threads: config['split_snps_cores']
     shell:
-    """
-    Rscript {params.script} {output} {input} {params.nb_groups} {params.nb_genotypes} {threads}
-    """
+        """
+        Rscript {params.script} {output} {input} {params.nb_groups} {params.nb_genotypes} {threads}
+        """
 
 
 
@@ -118,9 +118,9 @@ rule test_file:
         logname = "test_vcf_{chromosome}",
         logdir = os.path.join(outdir, "log")
     shell:
-    """
-    Rscript {params.script} {output.test_file} {output.snp_file} {params.genotype_id} {input}
-    """
+        """
+        Rscript {params.script} {output.test_file} {output.snp_file} {params.genotype_id} {input}
+        """
 
 ######################
 #### SELECT SNPS
@@ -157,9 +157,9 @@ rule split_snps:
         logdir = os.path.join(outdir, "log")
     threads: config['split_snps_cores']
     shell:
-    """
-    Rscript {params.script} {input} {output} {params.nb_snps} {params.chrom_length} {threads}
-    """
+        """
+        Rscript {params.script} {input} {output} {params.nb_snps} {params.chrom_length} {threads}
+        """
 
 elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 # source_genotypes = config["source_genotypes"]
