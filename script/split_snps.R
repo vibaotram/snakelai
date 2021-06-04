@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 
-mylib <- "/R_lib"
+mylib <- "./R_lib"
 dir.create(mylib, showWarnings = F)
 
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib)
