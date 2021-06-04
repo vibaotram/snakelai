@@ -223,7 +223,7 @@ rule read_elai:
         genome_file = config["genome"],
         logname = "read_elai_{chromosome}_{elai_params}",
         logdir = os.path.join(outdir, "log")
-    conda: "conda_rmarkdown.yaml"
+    conda: "conda/conda_rmarkdown.yaml"
     script: "script/read_elai.Rmd"
 
 rule test:
