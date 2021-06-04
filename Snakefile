@@ -122,7 +122,7 @@ rule split_test_chrom:
     shell:
         """
         cd $(dirname {output})
-        vcftools --vcf {input} --chr {wildcards.chromosome} --indv {params.indv} --out test_{wildcards.chromosome} --recode
+        vcftools --vcf {input} --chr {wildcards.chromosome} {params.indv} --out test_{wildcards.chromosome} --recode
         """
 
 rule test_file:
