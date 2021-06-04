@@ -1,0 +1,27 @@
+#source_genotypes: ["/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_AG", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_C", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_D", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_ER", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_OB"]
+
+source_genotypes: ["/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_AG", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_ER"]
+
+test_genotype: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/test_hybrid"
+
+snp_file: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/snp.pos"
+
+genome: "/data3/projects/vietcaf/reference/CC1.8_v2_pseudomolecule_cat.fa" # fasta file
+
+random_snps: true # random or ordered
+n_batches: 1 # only if "random" split
+batch_size: 1000 # number of snps per batch
+snp_den: [1, 500000] # random selection only, snp density: [nb snps, per kb]. if this object is set, batch_size will be ignored
+split_snps_cores: 20
+
+outdir: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/output"
+
+elai_source: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+elai_params:
+  c5_mg5_s2: "-c 5 -mixgen 5 -s 2 --exclude-nopos --exclude-miss1"
+  #c5_mg10_s60: "-c 5 -mixgen 10 -s 60 --exclude-nopos --exclude-miss1"
+
+elai_mem_gb: 5
+
+true_inference: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/test_10_clones/optimize_elai/elai/input/true_inference.tsv" # tsv file, columns: "id", "ancestry", "true_dosage"
+
