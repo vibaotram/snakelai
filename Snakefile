@@ -67,7 +67,7 @@ k = range(1, nb_groups+1)
 nb_genotypes = config['nb_genotypes']
 
 rule simulate_source:
-    input: split_source_chrom.output
+    input: rules.split_source_chrom.output
     output: expand(os.path.join(outdir, 'source', '{chromosome}', 'group_{k}'), chromosome = wildcards.chromosome, k = k)
     params:
         # nb_snps = nb_snps,
