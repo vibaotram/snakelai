@@ -109,7 +109,7 @@ if not all(id in test_vcf_reader.samples for id in genotype_id):
 
 vcftools_indv = []
 for id in genotype_id:
-    vcftools.append("--indv {id}".format(id=id))
+    vcftools_indv.append("--indv {id}".format(id=id))
 
 rule split_test_chrom:
     input: test_vcf
