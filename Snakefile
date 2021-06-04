@@ -206,7 +206,7 @@ rule elai:
 #     aggregate_outdir = os.path.join(outdir, "final_results")
 
 rule read_elai:
-    input: expand(rules.elai.output, elai_params = "{elai_params}", elai_ext = ["admix.txt", "ps21.txt"])
+    input: expand(rules.elai.output, chromosome = "{chromosome}", elai_params = "{elai_params}", elai_ext = ["admix.txt", "ps21.txt"])
     output: os.path.join(outdir, "elai_results", "{chromosome}", "{elai_params}", "elai_results.html")
     params:
         elai_options = lambda wildcards: config["elai_params"][wildcards.elai_params],
