@@ -1,10 +1,10 @@
 #!/usr/bin/env Rscript
 
 mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
+.libPaths(mylib)
 
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib)
 if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib)
-.libPaths(mylib)
 library(dplyr)
 library(parallel)
 
