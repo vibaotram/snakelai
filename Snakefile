@@ -107,8 +107,26 @@ else:
 if not all(id in test_vcf_reader.samples for id in genotype_id):
     raise ValueError("Specified genotype IDs do not present in the test_vcf file")
 
-rule test_file:
+vcftools_indv = []
+for id in genotype_id:
+    vcftools.append("--indv {id}".format(id=id))
+
+rule split_test_chrom:
     input: test_vcf
+    output: os.path.join(outdir, 'test', '{chromosome}', 'test_{chromosome}.recode.vcf')
+    params:
+        indv = vcftools_indv,
+        logname = "split_test_chrom_{chromosome}",
+        logdir = os.path.join(outdir, "log")
+    envmodules: vcftools_module
+    shell:
+        """
+        cd $(dirname {output})
+        vcftools --vcf {input} --chr {wildcards.chromosome} --indv {params.indv} --out test_{wildcards.chromosome} --recode
+        """
+
+rule test_file:
+    input: rules.split_test_chrom.output
     output:
         test_file = os.path.join(outdir, 'test', '{chromosome}', 'test_{chromosome}.geno'),
         snp_file = os.path.join(outdir, 'test', '{chromosome}', 'all_snp.geno')
