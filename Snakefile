@@ -56,7 +56,7 @@ rule finish:
 
 rule split_source_chrom:
     input: source_vcf
-    output: os.path.join(outdir, 'source', '{chromosome}', '{source_name}_{chromosome}.recode.vcf')
+    output: os.path.join(outdir, 'source', '{chromosome}', source_name+'_{chromosome}.recode.vcf')
     params:
         logname = "split_source_chrom_{chromosome}",
         logdir = os.path.join(outdir, "log")
@@ -64,7 +64,7 @@ rule split_source_chrom:
     shell:
         """
         cd $(dirname {output})
-        vcftools --vcf {input} --chr {wildcards.chromosome} --out {source_name}_{chromosome} --recode
+        vcftools --vcf {input} --chr {wildcards.chromosome} --out {source_name}_{wildcards.chromosome} --recode
         """
 
 ###### CREATE ELAI SOURCE FILE
