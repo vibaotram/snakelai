@@ -141,8 +141,8 @@ rule split_snps:
     script: "script/split_snps.R"
 
 elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
-source_genotypes = config["source_genotypes"]
-test_genotype = config["test_genotype"]
+# source_genotypes = config["source_genotypes"]
+# test_genotype = config["test_genotype"]
 elai_params = list(config["elai_params"].keys())
 elai_ext = ["admix.txt", "em.txt", "log.txt", "ps21.txt", "snpinfo.txt"]
 
