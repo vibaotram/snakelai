@@ -180,7 +180,7 @@ rule elai:
     input:
         source_genotypes = source_genotypes,
         test_file = rules.test_file.output.test_file,
-        snp_file = rules.test_file.output.snp_file,
+        snp_file = rules.split_snps.output,
     output:
         # expand(os.path.join(outdir, "batch_{batchid}/output_{elai_params}/elai_r.{elai_ext}"), batchid = "{batchid}", elai_params = "{elai_params}", elai_ext = elai_ext)
         expand(os.path.join(outdir, "elai", "{chromosome}", "{elai_params}", "elai_r.{elai_ext}"), chromosome= "{chromosome}", elai_params = "{elai_params}", elai_ext=elai_ext)
