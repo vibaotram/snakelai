@@ -2,8 +2,8 @@
 
 .libPaths("/home/baotram/R/x86_64-pc-linux-gnu-library/4.0")
 
-if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
-if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
+if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
+if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
 
 library(dplyr)
 library(parallel)

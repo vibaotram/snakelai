@@ -2,11 +2,11 @@
 
 .libPaths("/home/baotram/R/x86_64-pc-linux-gnu-library/4.0")
 
-if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
-if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
-if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org")
+if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
+if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
+if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
 if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org", dependencies = TRUE, lib = .libPaths()[1])
-if (!requireNamespace("optparse", quietly = TRUE)) install.packages('optparse', repos = "https://cloud.r-project.org")
+if (!requireNamespace("optparse", quietly = TRUE)) install.packages('optparse', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
 
 suppressPackageStartupMessages(library("optparse"))
 library(dplyr)

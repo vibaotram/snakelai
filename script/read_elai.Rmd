@@ -8,10 +8,11 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(eval = TRUE)
-if (!requireNamespace("DT", quietly = TRUE)) install.packages('DT', repos = "https://cloud.r-project.org")
-if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages('ggplot2', repos = "https://cloud.r-project.org")
-if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
-if (!requireNamespace("data.table", quietly = TRUE)) install.packages('data.table', repos = "https://cloud.r-project.org")
+.libPaths("/home/baotram/R/x86_64-pc-linux-gnu-library/4.0")
+if (!requireNamespace("DT", quietly = TRUE)) install.packages('DT', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
+if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages('ggplot2', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
+if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
+if (!requireNamespace("data.table", quietly = TRUE)) install.packages('data.table', repos = "https://cloud.r-project.org", lib = .libPaths()[1])
 
 library(DT)
 library(dplyr)
@@ -166,5 +167,3 @@ ggplot(all_dosage %>% dplyr::distinct(pos)) +
 save(all_adm,all_dosage, r, file = file.path(elai_dir, "elai_results.RData"))
 sessionInfo()
 ```
-
-
