@@ -12,7 +12,7 @@ def unique_chrom(vcf):
     # intilize a null list
     unique_list = []
 
-    configs = vcf.contigs
+    contigs = vcf.contigs
     for c in contigs:
         if re.match("Contig\\d+", c):
             pass
