@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
 
+.libPaths("/home/baotram/R/x86_64-pc-linux-gnu-library/4.0")
+
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
 if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
 
@@ -51,16 +53,14 @@ for (b in batch) {
       }, mc.cores = cores, mc.preschedule = F) %>% unlist
       snp_batch <- snp_info %>% filter(pos %in% sample_pos)
     }
-    
+
   } else {
     start <- size*(b-1) + 1
     end <- size*b
     if (end > nrow(snp_info)) end <- nrow(snp_info)
-    
+
     snp_batch <- snp_info[start:end,]
   }
-  
+
   write.table(snp_batch, output[b], sep = ",", row.names = F, col.names = F, quote = F)
 }
-
-

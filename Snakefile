@@ -87,7 +87,7 @@ rule simulate_source:
         logname = "simulate_source_{chromosome}",
         logdir = os.path.join(outdir, "log")
     threads: config['split_snps_cores']
-    conda: "conda/conda_rmarkdown.yaml"
+    singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
         Rscript {params.script} -o {output} -i {input} -g {params.nb_groups} -n {params.nb_genotypes} -t {threads}

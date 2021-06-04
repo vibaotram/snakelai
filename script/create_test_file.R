@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
 
+.libPaths("/home/baotram/R/x86_64-pc-linux-gnu-library/4.0")
+
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
 if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
 if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org")
@@ -34,11 +36,9 @@ test_geno <- t(chr_geno)
 test_gt <- geno2elai_gt(test_geno, chr_snps)
 rownames(test_gt) <- genotype_id
 colnames(test_gt) <- chr_snps$ID
-write_elai_geno(test_gt, out_file) 
+write_elai_geno(test_gt, out_file)
 
 
 
 snp_pos <- chr_snps %>% dplyr::mutate(CHROM = as.numeric(gsub(".*Chr|_\\d+", "", CHROM))) %>% dplyr::select("ID", "POS", "CHROM")
 fwrite(snp_pos, snp_file, sep = ",", row.names = F, col.names = F, quote = F)
-
-

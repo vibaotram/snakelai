@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
 
+.libPaths("/home/baotram/R/x86_64-pc-linux-gnu-library/4.0")
+
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
 if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
 if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org")
@@ -33,18 +35,18 @@ option_list <- list(
 )
 
 myArgs <- parse_args(
-  OptionParser(usage = "%prog [-o output] [-i input] [-h nb_groups] [-n nb_genotypes] [-t threads]", 
+  OptionParser(usage = "%prog [-o output] [-i input] [-h nb_groups] [-n nb_genotypes] [-t threads]",
   option_list = option_list
   )
 
 
-out_files <- myArgs$output 
+out_files <- myArgs$output
 outdir <- unique(dirname(out_files))
 vcf_file <- myArgs$input
-cores <- myArgs$threads 
+cores <- myArgs$threads
 # nb_batches = nb_batches
-nb_groups <- myArgs$nb_groups 
-nb_genotypes <- myArgs$nb_groups 
+nb_groups <- myArgs$nb_groups
+nb_genotypes <- myArgs$nb_groups
 
 
 
@@ -95,7 +97,7 @@ mclapply(1:ncol(chr_freq), function(v) {
   writeLines(c(n_inds, n_snps, paste(c("ID", ind_names), collapse = ",")), grp_elai_input)
   freq <- chr_freq[,v] # get allele freq of the group
   geno <- matrix(nrow=n_inds, ncol=n_snps) # genotype matrix of the group
-  for (i in 1:n_snps) { 
+  for (i in 1:n_snps) {
     # for locus i, frequencies of 0, 1, 2 genotype are in row 3i-2, 3i-1, 3i of freq matrix
     sml_geno <-  sample(c(0,1,2), n_inds, prob = c(freq[3*i-2], freq[3*i-1], freq[3*i]), replace = T)
     snp_id <- chr_gl@loc.names[i]
