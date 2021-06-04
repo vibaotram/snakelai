@@ -1,12 +1,4 @@
----
-title: "Simulate source genotypes"
-author: "Tram"
-date: "r'Sys.Date()'"
-output: html_document
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, results = FALSE)
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
 if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
 if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org")
@@ -17,9 +9,9 @@ library(parallel)
 library(vcfR)
 
 source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
-```
 
-```{r params}
+
+
 out_files <- snakemake@output
 outdir <- unique(dirname(out_files))
 vcf_file <- snakemake@input
@@ -29,22 +21,22 @@ cores = snakemake@threads
 # nb_batches = nb_batches
 nb_groups = snakemake@params$nb_groups
 nb_genotypes = snakemake@params$nb_genotypes
-```
 
 
 
-```{r read_vcf}
+
+
 vcf_R <- read.vcfR(vcf_file)
 # small_vcfR <- vcf_R[sample(1:nrow(vcf_R), nb_snps)]
-```
 
-```{r snmf_dir, include=FALSE}
+
+
 snmf_dir <- file.path(outdir, "snmf")
 dir.create(snmf_dir, showWarnings = F)
 geno_file <- file.path(snmf_dir, "chr.geno")
-```
 
-```{r snmf, eval=FALSE}
+
+
 # get genotypes
 # vcf_R@fix[,1] <- gsub(".", "_", vcf_R@fix[,1], fixed = T)
 chr_gl <- vcfR2genlight(vcf_R, n.cores = cores)
@@ -57,13 +49,11 @@ chr_snmf <- snmf(geno_file, K = nb_groups,
                  project = "new", entropy = T, seed = 987654321)
 
 # chr1_snmf <- load.snmfProject(file.path(snmf_chr1_dir, "chr1.snmfProject"))
-```
 
----
 
-generate genotypes based on ancestral genotypic freq (100 genotypes/group)
+## generate genotypes based on ancestral genotypic freq (100 genotypes/group)
 
-```{r ancestral_genotypes, eval=FALSE}
+
 # get ancestral geno freq
 chr_freq <- G(chr_snmf, K = nb_groups, run = best_run)
 # colnames(chr_freq) <- c("C", "AG", "OB", "D", "ER")
@@ -91,4 +81,3 @@ mclapply(1:ncol(chr_freq), function(v) {
   }
   return(v)
   }, mc.cores = 5, mc.preschedule = F)
-```

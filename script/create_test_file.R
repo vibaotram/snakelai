@@ -1,12 +1,4 @@
----
-title: "Create elai test file"
-author: "Tram"
-date: "6/4/2021"
-output: html_document
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, results = FALSE)
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
 if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
 if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org")
@@ -17,17 +9,16 @@ library(parallel)
 library(vcfR)
 
 source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
-```
 
-```{r params}
+
 test_file <- snakemake@output$test_file
 snp_file <- snakemake@output$snp_file
 genotype_id <- snakemake@params$genotype_id
 vcf_file <- snakemake@input
-```
 
 
-```{r test_file}
+
+
 vcf_R <- read.vcfR(vcf_file)
 chr_gl <- vcfR2genlight(vcf_R, n.cores = cores)
 chr_snps <- <- as.data.frame(getFIX(vcf_R), stringsAsFactors = F)
@@ -40,10 +31,10 @@ test_gt <- geno2elai_gt(test_geno, chr_snps)
 rownames(test_gt) <- genotype_id
 colnames(test_gt) <- chr_snps$ID
 write_elai_geno(test_gt, out_file) 
-```
 
-```{r snp_file}
+
+
 snp_pos <- chr_snps %>% dplyr::mutate(CHROM = as.numeric(gsub(".*Chr|_\\d+", "", CHROM))) %>% dplyr::select("ID", "POS", "CHROM")
 fwrite(snp_pos, snp_file, sep = ",", row.names = F, col.names = F, quote = F)
-```
+
 
