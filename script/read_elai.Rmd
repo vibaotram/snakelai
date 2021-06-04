@@ -88,7 +88,7 @@ elai_dir = unique(dirname(as.character(snakemake@input)))
 
 elai_results <- lapply(elai_dir, function(d) {
   elai_res <- read_elai(d)
-  adm <- data.frame(elai_res$oveall_admixture, "batch" = basename(dirname(d)), stringsAsFactors = F)
+  adm <- data.frame(elai_res$oveall_admixture, "chromosome" = basename(dirname(d)), stringsAsFactors = F)
   dosage <- elai_res$ancestral_dosage
   return(list("oveall_admixture" = adm, "ancestral_dosage" = dosage))
   })

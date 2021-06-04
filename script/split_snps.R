@@ -11,12 +11,16 @@ output <- as.character(snakemake@output)
 snp_info <- read.csv(snp_file, header = F, stringsAsFactors = F)
 colnames(snp_info) <- c("id", "pos", "chr")
 
-random_snps <- snakemake@params$random_snps
+# random_snps <- snakemake@params$random_snps
+random_snps <- TRUE
 
-snp_den <- snakemake@params$snp_den
+# snp_den <- snakemake@params$snp_den
+snp_den <- c(snakemake@params$nb_snps, snakemake@params$chrom_length)
 
-batch <- as.numeric(snakemake@params$batch)
-size <- as.numeric(snakemake@params$batch_size)
+# batch <- as.numeric(snakemake@params$batch)
+# size <- as.numeric(snakemake@params$batch_size)
+batch <- 1
+size <- snakemake@params$chrom_length
 
 cores <- as.numeric(snakemake@threads)
 
@@ -54,3 +58,5 @@ for (b in batch) {
   
   write.table(snp_batch, output[b], sep = ",", row.names = F, col.names = F, quote = F)
 }
+
+

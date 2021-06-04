@@ -1,28 +1,103 @@
 import pandas as pd
 import math
 import os
+import vcf
+import re
 
 # configfile: "config.yaml"
 
+def unique_chrom(vcf):
+
+    # intilize a null list
+    unique_list = []
+
+    configs = vcf.contigs
+    for c in contigs:
+        if re.match("Contig\\d+", c):
+            pass
+        else:
+            unique_list.append(c)
+    return unique_list
+
+
 outdir = config["outdir"]
 
-snp_file = config["snp_file"]
+# snp_file = config["snp_file"]
+#
+# random_snps = config["random_snps"]
+#
+# batch_size = config["batch_size"]
+#
+# snp_den = config["snp_den"]
+#
+# if random_snps:
+#     n_batch = config["n_batches"]
+# else:
+#     snp_info = pd.read_table(snp_file, delim_whitespace=True, header=None)
+#     n_batch = math.ceil(len(snp_info)/batch_size)
+#
+# batchid = list(range(1, n_batch + 1))
 
-random_snps = config["random_snps"]
+# elai = config["elai_source"]
 
-batch_size = config["batch_size"]
+######################
+#### PREPARE SOURCE GENOTYPES
 
-snp_den = config["snp_den"]
+###### SPLIT SOURCE GENOTYPES BY CHROMOSOME
 
-if random_snps:
-    n_batch = config["n_batches"]
+source_vcf = config['source_vcf']
+source_name = os.path.splitext(os.path.splitext(os.path.basename(source_vcf))[0])[0]
+vcftools_module = 'bioinfo/vcftools/0.1.16'
+
+chromosome = config['chromosome']
+source_vcf_reader = vcf.Reader(open(source_vcf, 'r'))
+source_chromosome = unique_chrom(source_vcf_reader)
+if chromosome == '@':
+    chromosome = source_chromosome
+else if not all(c in source_chromosome for c in chromosome):
+    raise ValueError('Specified chromosomes do not present in the source_vcf file')
 else:
-    snp_info = pd.read_table(snp_file, delim_whitespace=True, header=None)
-    n_batch = math.ceil(len(snp_info)/batch_size)
+    pass
 
-batchid = list(range(1, n_batch + 1))
+rule split_source_chrom:
+    input: source_vcf
+    output: os.path.join(outdir, 'source', 'vcf_by_chrom', '{source_name}_{chromosome}.recode.vcf')
+    params:
+        logname = "split_source_chrom_{chromosome}",
+        logdir = os.path.join(outdir, "log")
+    envmodules: vcftools_module
+    shell:
+        """
+        vcftools --vcf {input} --chr {wildcards.chromosome} --out {source_name}_{wildcards.chromosome} --recode
+        """
 
-elai = config["elai_source"]
+###### SELECT SNPS
+
+nb_snps = config['nb_snps']
+chrom_length = config['chrom_length'] # "chrom"/integer
+# nb_batches = config['nb_batches']
+
+nb_groups = config['nb_groups']
+k = range(1, nb_groups+1)
+nb_genotypes = config['nb_genotypes']
+
+rule simulate_source:
+    input: split_source_chrom.output
+    output: expand(os.path.join(outdir, 'source', 'simulated_ancestral_genotypes', '{source_name}_{chromosome}_{k}.recode.vcf'), chromosome = wildcards.chromosome, k = k)
+    params:
+        nb_snps = nb_snps,
+        chrom_length = chrom_length,
+        # nb_batches = nb_batches,
+        nb_groups = nb_groups,
+        nb_genotypes = nb_genotypes,
+        logname = "simulate_source_{chromosome}",
+        logdir = os.path.join(outdir, "log")
+    threads: config['split_snps_cores']
+    script: "script/simulate_source.R"
+
+
+
+elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 source_genotypes = config["source_genotypes"]
 test_genotype = config["test_genotype"]
 elai_params = list(config["elai_params"].keys())
@@ -116,4 +191,3 @@ rule read_elai:
 
 rule test:
     shell: "echo {source_files}"
-
