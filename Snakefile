@@ -46,6 +46,11 @@ elif not all(c in source_chromosome for c in chromosome):
 else:
     pass
 
+rule finish:
+    input:
+        #expand(os.path.join(outdir, "final_results/output_{elai_params}/{files}"), elai_params = elai_params, files = ["overall_admixture.tsv", "local_dosage.tsv"])
+        expand(os.path.join(outdir, "elai_results", "{chromosome}", "{elai_params}", "elai_results.html"), chromosome=chromosome, elai_params=elai_params)
+        
 rule split_source_chrom:
     input: source_vcf
     output: os.path.join(outdir, 'source', '{chromosome}', '{source_name}_{chromosome}.recode.vcf')
@@ -221,8 +226,3 @@ rule read_elai:
 
 rule test:
     shell: "echo {source_files}"
-
-rule finish:
-    input:
-        #expand(os.path.join(outdir, "final_results/output_{elai_params}/{files}"), elai_params = elai_params, files = ["overall_admixture.tsv", "local_dosage.tsv"])
-        expand(os.path.join(outdir, "elai_results", "{chromosome}", "{elai_params}", "elai_results.html"), chromosome=chromosome, elai_params=elai_params)
