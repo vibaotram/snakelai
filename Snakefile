@@ -136,7 +136,8 @@ rule test_file:
         script = "script/create_test_file.R",
         logname = "test_file_{chromosome}",
         logdir = os.path.join(outdir, "log")
-    conda: "conda/conda_rmarkdown.yaml"
+    # conda: "conda/conda_rmarkdown.yaml"
+    singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
         Rscript {params.script} {output.test_file} {output.snp_file} {params.genotype_id} {input}
@@ -176,7 +177,8 @@ rule split_snps:
         logname = "split_snps_{chromosome}",
         logdir = os.path.join(outdir, "log")
     threads: config['split_snps_cores']
-    conda: "conda/conda_rmarkdown.yaml"
+    # conda: "conda/conda_rmarkdown.yaml"
+    singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
         Rscript {params.script} {input} {output} {params.nb_snps} {params.chrom_length} {threads}
