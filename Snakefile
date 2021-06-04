@@ -46,7 +46,7 @@ source_vcf_reader = vcf.Reader(open(source_vcf, 'r'))
 source_chromosome = unique_chrom(source_vcf_reader)
 if chromosome == '@':
     chromosome = source_chromosome
-else if not all(c in source_chromosome for c in chromosome):
+elif not all(c in source_chromosome for c in chromosome):
     raise ValueError('Specified chromosomes do not present in the source_vcf file')
 else:
     pass
