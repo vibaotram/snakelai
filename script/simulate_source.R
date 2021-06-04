@@ -11,17 +11,16 @@ library(vcfR)
 
 source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
 
+args <- commandArgs(trailingOnly = TRUE)
 
 
-out_files <- snakemake@output
+out_files <- args[1] #snakemake@output
 outdir <- unique(dirname(out_files))
-vcf_file <- snakemake@input
-# nb_snps = snakemake@params$nb_snps
-# chrom_length = snakemake@params$chrom_length
-cores = snakemake@threads
+vcf_file <- args[2] #snakemake@input
+cores <- args[3] #snakemake@threads
 # nb_batches = nb_batches
-nb_groups = snakemake@params$nb_groups
-nb_genotypes = snakemake@params$nb_genotypes
+nb_groups <- args[4] #snakemake@params$nb_groups
+nb_genotypes <- args[5] #snakemake@params$nb_genotypes
 
 
 

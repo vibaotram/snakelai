@@ -83,10 +83,15 @@ rule simulate_source:
         # nb_batches = nb_batches,
         nb_groups = nb_groups,
         nb_genotypes = nb_genotypes,
+        script = "script/simulate_source.R",
         logname = "simulate_source_{chromosome}",
         logdir = os.path.join(outdir, "log")
     threads: config['split_snps_cores']
-    script: "script/simulate_source.R"
+    shell:
+    """
+    Rscript {PARAMS.script} {output} {input} {params.nb_groups} {params.nb_genotypes} {threads}
+    """
+
 
 
 ######################
@@ -109,9 +114,13 @@ rule test_file:
     threads: config['split_snps_cores']
     params:
         genotype_id = genotype_id,
+        script = "script/create_test_file.R",
         logname = "test_vcf_{chromosome}",
         logdir = os.path.join(outdir, "log")
-    script: "script/create_test_file.R"
+    shell:
+    """
+    Rscript {params.script} {output.test_file} {output.snp_file} {params.genotype_id} {input}
+    """
 
 ######################
 #### SELECT SNPS
@@ -143,10 +152,14 @@ rule split_snps:
     params:
         nb_snps = nb_snps,
         chrom_length = chrom_length,
+        script = "script/split_snps.R",
         logname = "split_snps_{chromosome}",
         logdir = os.path.join(outdir, "log")
     threads: config['split_snps_cores']
-    script: "script/split_snps.R"
+    shell:
+    """
+    Rscript {params.script} {input} {output} {params.nb_snps} {params.chrom_length} {threads}
+    """
 
 elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 # source_genotypes = config["source_genotypes"]

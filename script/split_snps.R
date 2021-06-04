@@ -6,9 +6,11 @@ if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', 
 library(dplyr)
 library(parallel)
 
-snp_file <- as.character(snakemake@input)
+args <- commandArgs(trailingOnly = TRUE)
 
-output <- as.character(snakemake@output)
+snp_file <- args[1] #as.character(snakemake@input)
+
+output <- args[2] #as.character(snakemake@output)
 
 snp_info <- read.csv(snp_file, header = F, stringsAsFactors = F)
 colnames(snp_info) <- c("id", "pos", "chr")
@@ -17,14 +19,14 @@ colnames(snp_info) <- c("id", "pos", "chr")
 random_snps <- TRUE
 
 # snp_den <- snakemake@params$snp_den
-snp_den <- c(snakemake@params$nb_snps, snakemake@params$chrom_length)
+snp_den <- c(args[3], args[4]) # c(snakemake@params$nb_snps, snakemake@params$chrom_length)
 
 # batch <- as.numeric(snakemake@params$batch)
 # size <- as.numeric(snakemake@params$batch_size)
 batch <- 1
-size <- snakemake@params$chrom_length
+size <-  args[4] #snakemake@params$chrom_length
 
-cores <- as.numeric(snakemake@threads)
+cores <-  args[5] #as.numeric(snakemake@threads)
 
 # print(batch)
 for (b in batch) {
