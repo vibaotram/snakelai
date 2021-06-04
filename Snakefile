@@ -134,7 +134,7 @@ rule test_file:
     params:
         genotype_id = genotype_id,
         script = "script/create_test_file.R",
-        logname = "test_vcf_{chromosome}",
+        logname = "test_file_{chromosome}",
         logdir = os.path.join(outdir, "log")
     conda: "conda/conda_rmarkdown.yaml"
     shell:
