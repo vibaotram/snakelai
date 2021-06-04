@@ -86,7 +86,7 @@ rule simulate_source:
         logname = "simulate_source_{chromosome}",
         logdir = os.path.join(outdir, "log")
     threads: config['split_snps_cores']
-    script: "script/simulate_source.Rmd"
+    script: "script/simulate_source.R"
 
 
 ######################
@@ -111,7 +111,7 @@ rule test_file:
         genotype_id = genotype_id,
         logname = "test_vcf_{chromosome}",
         logdir = os.path.join(outdir, "log")
-    script: "script/create_test_file.Rmd"
+    script: "script/create_test_file.R"
 
 ######################
 #### SELECT SNPS
