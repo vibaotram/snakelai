@@ -133,7 +133,7 @@ rule test_file:
         snp_file = os.path.join(outdir, 'test', '{chromosome}', 'all_snp.geno')
     threads: config['split_snps_cores']
     params:
-        genotype_id = genotype_id,
+        # genotype_id = genotype_id,
         script = "script/create_test_file.R",
         logname = "test_file_{chromosome}",
         logdir = os.path.join(outdir, "log")
@@ -141,7 +141,7 @@ rule test_file:
     singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
-        Rscript {params.script} {output.test_file} {output.snp_file} {params.genotype_id} {input}
+        Rscript {params.script} {output.test_file} {output.snp_file} {input}
         """
 
 ######################
