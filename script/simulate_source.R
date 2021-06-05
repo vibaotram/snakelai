@@ -49,7 +49,7 @@ vcf_file <- myArgs$input
 cores <- myArgs$threads
 # nb_batches = nb_batches
 nb_groups <- myArgs$nb_groups
-nb_genotypes <- myArgs$nb_groups
+nb_genotypes <- myArgs$nb_genotypes
 
 
 
