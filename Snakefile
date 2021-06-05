@@ -87,7 +87,7 @@ rule simulate_source:
         script = "script/simulate_source.R",
         logname = "simulate_source_{chromosome}",
         logdir = os.path.join(outdir, "log")
-    threads: config['split_snps_cores']
+    threads: config['simulate_cores']
     singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """

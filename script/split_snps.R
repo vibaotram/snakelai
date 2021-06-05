@@ -39,13 +39,13 @@ for (b in batch) {
     if (is.null(snp_den) || length(snp_den) != 2) {
       snp_batch <- snp_info[sort(sample(1:nrow(snp_info), size)),]
     } else {
-      n_snp <- snp_den[1]
-      size <- snp_den[2]
+      n_snp <- as.numeric(args[3])
+      size <- as.numeric(args[4])
       chr_seq <- seq(1, max(snp_info$pos), size)
       seq_ind <- seq_along(chr_seq)
       sample_pos <- mclapply(seq_ind, function(i) {
         if (i < max(seq_ind)) {
-          pos <- snp_info$pos[snp_info$pos %in% chr_seq[i]:(chr_seq[i+1]-1)]
+          pos <- snp_info$pos[snp_info$pos %in% c(chr_seq[i]:(chr_seq[i+1]-1))]
         } else {
           pos <- snp_info$pos[snp_info$pos > chr_seq[i]]
         }

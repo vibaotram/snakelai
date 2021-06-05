@@ -29,10 +29,12 @@ nb_snps: 1 # "all"/integer
 chrom_length: 5000 # "chrom"/integer
 # nb_batches: 1 # number of snp sets to be randomly selected
 
+
 ######################
 #### SOURCE GENOTYPES SIMULATION
 nb_groups: 5
 nb_genotypes: 100 # nb of genotypes per group
+simulate_cores: 10
 
 ####################
 #### ELAI PARAMS
