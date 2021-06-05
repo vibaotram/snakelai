@@ -131,7 +131,7 @@ rule test_file:
     output:
         test_file = os.path.join(outdir, 'test', '{chromosome}', 'test_{chromosome}.geno'),
         snp_file = os.path.join(outdir, 'test', '{chromosome}', 'all_snp.geno')
-    threads: config['split_snps_cores']
+    threads: 1 #config['split_snps_cores']
     params:
         genotype_id = genotype_id,
         script = "script/create_test_file.R",
