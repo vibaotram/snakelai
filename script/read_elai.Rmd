@@ -8,16 +8,16 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(eval = TRUE)
-mylib <- "./R_lib"
-dir.create(mylib, showWarnings = F)
-if (!requireNamespace("DT", quietly = TRUE)) install.packages('DT', repos = "https://cloud.r-project.org", lib = mylib)
-if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages('ggplot2', repos = "https://cloud.r-project.org", lib = mylib)
-if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib)
-if (!requireNamespace("data.table", quietly = TRUE)) install.packages('data.table', repos = "https://cloud.r-project.org", lib = mylib)
-library(DT)
-library(dplyr)
-library(ggplot2)
-library(data.table)
+mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
+# dir.create(mylib, showWarnings = F)
+# if (!requireNamespace("DT", quietly = TRUE)) install.packages('DT', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages('ggplot2', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("data.table", quietly = TRUE)) install.packages('data.table', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+library(DT, lib.loc = mylib)
+library(dplyr, lib.loc = mylib)
+library(ggplot2, lib.loc = mylib)
+library(data.table, lib.loc = mylib)
 ```
 
 ```{r functions}

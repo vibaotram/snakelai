@@ -1,19 +1,19 @@
 #!/usr/bin/env Rscript
 
 
-mylib <- "./R_lib"
-dir.create(mylib, showWarnings = F)
+mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
+# dir.create(mylib, showWarnings = F)
 .libPaths(mylib)
-if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib)
-if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib)
-if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org", lib = mylib)
-if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org", dependencies = TRUE, lib = mylib)
-if (!requireNamespace("optparse", quietly = TRUE)) install.packages('optparse', repos = "https://cloud.r-project.org", lib = mylib)
-suppressPackageStartupMessages(library("optparse"))
-library(dplyr)
-library(parallel)
-library(vcfR)
-library(adegenet)
+# if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org", dependencies = TRUE, lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("optparse", quietly = TRUE)) install.packages('optparse', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+suppressPackageStartupMessages(library("optparse", lib.loc = mylib))
+library(dplyr, lib.loc = mylib)
+library(parallel, lib.loc = mylib)
+library(vcfR, lib.loc = mylib)
+library(adegenet, lib.loc = mylib)
 
 source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
 
