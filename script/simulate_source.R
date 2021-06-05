@@ -84,6 +84,7 @@ chr_snmf <- snmf(geno_file, K = nb_groups,
 
 
 # get ancestral geno freq
+best_run <- which.min(cross.entropy(chr_snmf, K = nb_groups))
 chr_freq <- G(chr_snmf, K = nb_groups, run = best_run)
 # colnames(chr_freq) <- c("C", "AG", "OB", "D", "ER")
 chr_snps <- as.data.frame(getFIX(vcf_R), stringsAsFactors = F)
