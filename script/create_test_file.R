@@ -26,20 +26,23 @@ cores <- args[5]
 
 
 vcf_R <- read.vcfR(vcf_file)
-chr_gl <- vcfR2genlight(vcf_R, n.cores = cores)
-chr_snps <- as.data.frame(getFIX(vcf_R), stringsAsFactors = F)
-chr_snps$ID <- paste(chr_snps$CHROM, chr_snps$POS, sep = "_")
-chr_geno <- as.matrix(chr_gl)
-chr_geno[is.na(chr_geno)] <- 9
+# chr_gl <- vcfR2genlight(vcf_R, n.cores = cores)
 
-# test_geno <- t(chr_geno[genotype_id,])
-test_geno <- t(chr_geno)
-test_gt <- geno2elai_gt(test_geno, chr_snps)
-rownames(test_gt) <- genotype_id
-colnames(test_gt) <- chr_snps$ID
+# chr_geno <- as.matrix(chr_gl)
+# chr_geno[is.na(chr_geno)] <- 9
+#
+# # test_geno <- t(chr_geno[genotype_id,])
+# test_geno <- t(chr_geno)
+# test_gt <- geno2elai_gt(test_geno, chr_snps)
+# rownames(test_gt) <- genotype_id
+# colnames(test_gt) <- chr_snps$ID
+test_gt <- extract.gt(vcf_R, return.alleles = T)
+test_gt <- gsub("/", "", test_gt, fixed = T)
+test_gt <- gsub(".", "??", test_gt, fixed = T)
 write_elai_geno(test_gt, out_file)
 
 
-
+chr_snps <- as.data.frame(getFIX(vcf_R), stringsAsFactors = F)
+chr_snps$ID <- paste(chr_snps$CHROM, chr_snps$POS, sep = "_")
 snp_pos <- chr_snps %>% dplyr::mutate(CHROM = as.numeric(gsub(".*Chr|_\\d+", "", CHROM))) %>% dplyr::select("ID", "POS", "CHROM")
 fwrite(snp_pos, snp_file, sep = ",", row.names = F, col.names = F, quote = F)
