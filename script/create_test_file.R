@@ -20,7 +20,7 @@ args <- commandArgs(trailingOnly = TRUE)
 test_file <- args[1] #snakemake@output$test_file
 snp_file <- args[2] #snakemake@output$snp_file
 # genotype_id <- args[3] #snakemake@params$genotype_id
-vcf_file <- args[4] #snakemake@input
+vcf_file <- args[3] #snakemake@input
 
 
 
