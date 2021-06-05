@@ -42,6 +42,7 @@ myArgs <- parse_args(
 
 
 out_files <- myArgs$output
+out_files <- unlist(strsplit(out_files, ","))
 outdir <- unique(dirname(out_files))
 vcf_file <- myArgs$input
 cores <- myArgs$threads

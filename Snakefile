@@ -81,6 +81,7 @@ rule simulate_source:
         # nb_snps = nb_snps,
         # chrom_length = chrom_length,
         # nb_batches = nb_batches,
+        output = lambda wildcards, output: ','.join(output),
         nb_groups = nb_groups,
         nb_genotypes = nb_genotypes,
         script = "script/simulate_source.R",
@@ -90,7 +91,7 @@ rule simulate_source:
     singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
-        Rscript {params.script} -o {output} -i {input} -g {params.nb_groups} -n {params.nb_genotypes} -t {threads}
+        Rscript {params.script} -o {params.output} -i {input} -g {params.nb_groups} -n {params.nb_genotypes} -t {threads}
         """
 
 
