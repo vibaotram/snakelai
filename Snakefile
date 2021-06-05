@@ -141,7 +141,7 @@ rule test_file:
     singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
-        Rscript {params.script} {output.test_file} {output.snp_file} {params.genotype_id} {input}
+        Rscript {params.script} {output.test_file} {output.snp_file} {params.genotype_id} {input} {threads}
         """
 
 ######################
