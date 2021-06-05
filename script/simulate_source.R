@@ -110,4 +110,4 @@ mclapply(1:ncol(chr_freq), function(v) {
     cat(paste0(geno_li, "\n"), file = grp_elai_input, append = T)
   }
   return(v)
-  }, mc.cores = 5, mc.preschedule = F)
+}, mc.cores = cores, mc.preschedule = F)
