@@ -39,7 +39,7 @@ vcf_R <- read.vcfR(vcf_file)
 test_gt <- extract.gt(vcf_R, return.alleles = T)
 test_gt <- gsub("/", "", test_gt, fixed = T)
 test_gt <- gsub(".", "??", test_gt, fixed = T)
-write_elai_geno(test_gt, out_file)
+write_elai_geno(test_gt, test_file)
 
 
 chr_snps <- as.data.frame(getFIX(vcf_R), stringsAsFactors = F)
