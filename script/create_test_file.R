@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-mylib <- "./R_lib"
+mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
 # dir.create(mylib, showWarnings = F)
 
 # if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
