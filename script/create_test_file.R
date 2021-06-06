@@ -1,18 +1,18 @@
 #!/usr/bin/env Rscript
 
-# mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
-# .libPaths(mylib)
+mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
+.libPaths(mylib)
 # dir.create(mylib, showWarnings = F)
 
-if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
-if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org")
-if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org")
-if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org", dependencies = TRUE)
-library(dplyr)
-library(parallel)
-library(vcfR)
-library(adegenet)
-library(data.table)
+# if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+# if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org", dependencies = TRUE, lib = mylib, INSTALL_opts = "--no-lock")
+library(dplyr, lib.loc = mylib)
+library(parallel, lib.loc = mylib)
+library(vcfR, lib.loc = mylib)
+library(adegenet, lib.loc = mylib)
+library(data.table, lib.loc = mylib)
 
 source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
 
