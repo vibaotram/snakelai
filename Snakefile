@@ -239,12 +239,12 @@ rule elai:
     shell:
         """
         cd {params.workdir}
-        {elai} \
-        {params.source_files} \
-        -g {input.test_file} -p 1 \
-        -pos {input.snp_file} \
-        -o elai_r \
-        -C {params.upper} {params.options}
+        echo $({elai} \\
+        {params.source_files} \\
+        -g {input.test_file} -p 1 \\
+        -pos {input.snp_file} \\
+        -o elai_r \\
+        -C {params.upper} {params.options})
 
         mv output/* ./
         rm -rf output
