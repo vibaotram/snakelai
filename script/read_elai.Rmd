@@ -122,7 +122,7 @@ DT::datatable(all_adm)
 
 ## local ancestry inference
 ```{r plot_lai, fig.height=8, fig.width=15}
-all_dosage$ancestry <- factor(all_dosage$ancestry, levels = c("group_ER", "group_OB", "group_C", "group_D", "group_AG"))
+# all_dosage$ancestry <- factor(all_dosage$ancestry, levels = c("group_ER", "group_OB", "group_C", "group_D", "group_AG"))
 for (i in unique(all_dosage$individual)) {
   gp <- ggplot(all_dosage %>% filter(individual == i)) +
     geom_point(aes(x = pos, y = dosage, color = ancestry), size = 1.5, shape = 16, alpha = .5) +
