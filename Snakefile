@@ -228,6 +228,7 @@ rule elai:
         expand(os.path.join(outdir, "elai", "{chromosome}", "{elai_params}", "elai_r.{elai_ext}"), chromosome= "{chromosome}", elai_params = "{elai_params}", elai_ext=elai_ext)
     params:
         source_files = source_files,
+        upper = lambda wildcards, input: len(input.source_genotypes),
         options = lambda wildcards: config["elai_params"][wildcards.elai_params],
         # out_dir = lambda wildcards, output: os.path.basename(os.path.dirname(output[0])),
         workdir = lambda wildcards, output: os.path.dirname(output[0]),
@@ -243,7 +244,7 @@ rule elai:
         -g {input.test_file} -p 1 \
         -pos {input.snp_file} \
         -o elai_r \
-        -C {n_sources} {params.options}
+        -C {params.upper} {params.options}
 
         mv output/* ./
         rm -rf output
