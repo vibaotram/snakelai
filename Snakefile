@@ -205,13 +205,18 @@ elai_ext = ["admix.txt", "em.txt", "log.txt", "ps21.txt", "snpinfo.txt"]
 #     snp_batch = snp_info[start:end]
 #     snp_batch.to_csv(os.path.join(outdir, "batch_{}/snp_pos".format(i)), sep='\t', header=False, index=False)
 
-source_genotypes = rules.simulate_source.output
-n_sources = len(source_genotypes)
-source_files = ""
-for i in range(0, n_sources):
-    file = os.path.dirname(source_genotypes[i])
-    source_files+= "-g {file} -p 1{i} ".format(file=file, i=i)
+# source_genotypes = rules.simulate_source.output
+# n_sources = len(source_genotypes)
 
+
+def source_files(wildcards):
+    source_genotypes = rules.simulate_source.output
+    n_sources = len(source_genotypes)
+    source_files = ""
+    for i in range(0, n_sources):
+        file = source_genotypes[i]
+        source_files+= "-g {file} -p 1{i} ".format(file=file, i=i)
+    return unpack(source_files)
 
 rule elai:
     input:
