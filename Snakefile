@@ -259,7 +259,7 @@ rule read_elai:
     input: expand(rules.elai.output, chromosome = "{chromosome}", elai_params = "{elai_params}", elai_ext = ["admix.txt", "ps21.txt"])
     output: os.path.join(outdir, "elai_results", "{chromosome}", "{elai_params}", "elai_results.html")
     params:
-        elai_options = lambda wildcards: config["elai_params"][wildcards.elai_params],
+        elai_options = lambda wildcards: config["elai_params"]["{elai_params}"],
         adm_file = lambda wildcards, output: os.path.join(os.path.dirname(output), "overall_admixture.tsv"),
         dosage_file = lambda wildcards, output: os.path.join(os.path.dirname(output), "local_dosage.tsv"),
         # true_dosage_file = config["true_inference"],
