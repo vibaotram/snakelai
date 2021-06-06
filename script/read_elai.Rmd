@@ -165,6 +165,6 @@ ggplot(all_dosage %>% dplyr::distinct(pos)) +
 ```
 
 ```{r save_data, include=FALSE}
-save(all_adm,all_dosage, r, file = file.path(elai_dir, "elai_results.RData"))
+save(all_adm,all_dosage, file = file.path(elai_dir, "elai_results.RData"))
 sessionInfo()
 ```
