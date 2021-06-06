@@ -220,7 +220,7 @@ def source_files(wildcards):
 
 rule elai:
     input:
-        source_genotypes = source_genotypes(),
+        source_genotypes = rules.simulate_source.output,
         test_file = rules.test_file.output.test_file,
         snp_file = rules.split_snps.output,
     output:
