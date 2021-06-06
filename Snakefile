@@ -210,7 +210,7 @@ elai_ext = ["admix.txt", "em.txt", "log.txt", "ps21.txt", "snpinfo.txt"]
 
 
 def source_files(wildcards):
-    source_genotypes = expand(rules.simulate_source.output, chromosome="{wildcards.chromosome}", k = k)
+    source_genotypes = expand(rules.simulate_source.output, chromosome=wildcards.chromosome, k = k)
     n_sources = len(source_genotypes)
     source_files = ""
     for i in range(0, n_sources):
