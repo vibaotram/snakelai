@@ -277,7 +277,7 @@ rule elai:
         expand(os.path.join(outdir, "elai", "{chromosome}", "snp_selection", "{elai_params}", "elai_r.{elai_ext}"), chromosome= "{chromosome}", snp_selection="{snp_selection}", elai_params = "{elai_params}", elai_ext=elai_ext)
     params:
         source_files = source_files,
-        snp_file = os.path.join(outdir, "elai", "{chromosome}", "snp_selection", "test{batch}.geno")
+        snp_file = os.path.join(outdir, "elai", "{chromosome}", "snp_selection", "test{batch}.geno"),
         upper = lambda wildcards, input: len(input.source_genotypes),
         options = lambda wildcards: config["elai_params"][wildcards.elai_params],
         # out_dir = lambda wildcards, output: os.path.basename(os.path.dirname(output[0])),
