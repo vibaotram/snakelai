@@ -164,14 +164,12 @@ rule test_file:
 #
 # batchid = list(range(1, n_batch + 1))
 
-def select_snps_output(wildcards):
-    if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
-        n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
-        batch = list(range(1, n_batch + 1))
-        output = expand(os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test_{batch}.geno'), chromosome=wildcards.chromosome, batch=batch)
-    else:
-        output = os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test.geno')
-    return unpack(output)
+if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
+    n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
+    batch = list(range(1, n_batch + 1))
+    select_snps_output = expand(os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test_{batch}.geno'), chromosome=wildcards.chromosome, batch=batch)
+else:
+    select_snps_output = os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test.geno')
 
 
 
