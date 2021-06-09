@@ -173,9 +173,9 @@ rule test_file:
 #         select_snps_output = os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test.geno')
 #     return unpack(output)
 
-def get_batch(length, snp, window):
-    if snp == "all":
-        n_batch = math.ceil(chrom.length/window)
+def get_batch(snp_selection):
+    if config["snp_selection"][snp_selection]["nb_snps"] == "all":
+        n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
         batch = list(range(1, n_batch + 1))
     else:
         batch = ""
@@ -184,7 +184,7 @@ def get_batch(length, snp, window):
 rule select_snps:
     input: rules.test_file.output.snp_file
     output:
-        expand(os.path.join(outdir, 'test', '{chromosome}', "{snp_selection}", 'test.geno'), chromosome="{chromosome}", snp_selection="{snp_selection}")
+        expand(os.path.join(outdir, 'test', '{chromosome}', "{snp_selection}", 'test{batch}.geno'), chromosome="{chromosome}", snp_selection="{snp_selection}", batch = get_batch("{snp_selection}"))
         # select_snps_output
         # expand(os.path.join(outdir, "batch_{batchid}/snp_pos"), batchid = batchid)
     params:
