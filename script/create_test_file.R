@@ -45,5 +45,7 @@ write_elai_geno(test_gt, test_file)
 
 chr_snps <- as.data.frame(getFIX(vcf_R), stringsAsFactors = F)
 chr_snps$ID <- paste(chr_snps$CHROM, chr_snps$POS, sep = "_")
-snp_pos <- chr_snps %>% dplyr::mutate(CHROM = as.numeric(gsub(".*Chr|_\\d+", "", CHROM))) %>% dplyr::select("ID", "POS", "CHROM")
+snp_pos <- chr_snps %>%
+  dplyr::mutate(CHROM = as.numeric(gsub(".*Chr|_\\d+", "", CHROM))) %>%
+  dplyr::select("ID", "POS", "CHROM")
 fwrite(snp_pos, snp_file, sep = ",", row.names = F, col.names = F, quote = F)

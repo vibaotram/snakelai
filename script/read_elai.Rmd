@@ -161,7 +161,7 @@ for (i in unique(all_dosage$individual)) {
 # hist(unique(all_dosage$pos), breaks = 1000)
 ggplot(all_dosage %>% dplyr::distinct(pos)) +
   geom_histogram(aes(x = pos), binwidth = 1e5) +
-  ylab("count per 10kb")
+  ylab("count per 100kb")
 ```
 
 ```{r save_data, include=FALSE}

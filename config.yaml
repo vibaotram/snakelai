@@ -25,8 +25,13 @@ outdir: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/outpu
 # batch_size: 1000 # number of snps per batch
 # snp_den: [1, 500000] # random selection only, snp density: [nb snps, per kb]. if this object is set, batch_size will be ignored
 split_snps_cores: 20
-nb_snps: 1 # "all"/integer
-chrom_length: 5000 # "chrom"/integer
+snp_selection:
+  even:
+    nb_snps: 1 # "all"/integer
+    window_size: 5000 # "chrom"/integer
+  all:
+    nb_snps: "all" # "all"/integer
+    window_size: 500000 # "chrom"/integer
 # nb_batches: 1 # number of snp sets to be randomly selected
 
 
