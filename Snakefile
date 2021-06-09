@@ -164,7 +164,7 @@ rule test_file:
 #
 # batchid = list(range(1, n_batch + 1))
 
-if config["snp_selection"]["{snp_selection}".format(snp_selection="{snp_selection}")]["nb_snps"] == "all":
+if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
     n_batch = math.ceil(source_vcf_reader.contigs["{chromosome}"].length/config["snp_selection"]["{snp_selection}"]["window_size"])
     batch = list(range(1, n_batch + 1))
     select_snps_output = expand(os.path.join(outdir, 'test', '{chromosome}', "{snp_selection}", 'test_{batch}.geno'), chromosome="{chromosome}", batch=batch)
