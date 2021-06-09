@@ -164,20 +164,28 @@ rule test_file:
 #
 # batchid = list(range(1, n_batch + 1))
 
-def select_snps_output(wildcards):
-    if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
-        n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
+# def select_snps_output(wildcards):
+#     if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
+#         n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
+#         batch = list(range(1, n_batch + 1))
+#         select_snps_output = expand(os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test_{batch}.geno'), chromosome=wildcards.chromosome, batch=batch)
+#     else:
+#         select_snps_output = os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test.geno')
+#     return unpack(output)
+
+def get_batch(length, snp, window):
+    if snp == "all":
+        n_batch = math.ceil(chrom.length/window)
         batch = list(range(1, n_batch + 1))
-        select_snps_output = expand(os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test_{batch}.geno'), chromosome=wildcards.chromosome, batch=batch)
     else:
-        select_snps_output = os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test.geno')
-    return unpack(output)
-
-
+        batch = ""
+    return batch
 
 rule select_snps:
     input: rules.test_file.output.snp_file
-    output: select_snps_output
+    output:
+        expand(os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test_{batch}.geno'), chromosome=wildcards.chromosome, batch=get_batch(source_vcf_reader.contigs[wildcards.chromosome].length, config["snp_selection"][wildcards.snp_selection]["nb_snps"], config["snp_selection"][wildcards.snp_selection]["window_size"]))
+        # select_snps_output
         # expand(os.path.join(outdir, "batch_{batchid}/snp_pos"), batchid = batchid)
     params:
         nb_snps = lambda wildcards: config["snp_selection"][wildcards.snp_selection]["nb_snps"],
@@ -190,7 +198,7 @@ rule select_snps:
     singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
-        Rscript {params.script} -i {input} -n {params.nb_snps} -w {params.window_size} {threads}
+        Rscript {params.script} -i {input} -o {output} -n {params.nb_snps} -w {params.window_size} {threads}
         """
 
 elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
