@@ -157,6 +157,7 @@ submit_elai <- lapply(1:nrow(all_params), function(i) {
 elai_results <- lapply(submit_elai, function(j) {
   elai_dir <- get_slurm_out(j, outtype = 'table', wait = T)
   elai_dir <- as.character(elai_dir)
+  stop(elai_dir)
   elai_res <- read_elai(elai_dir)
   adm <- data.frame(elai_res$oveall_admixture, "batch" = basename(elai_dir), stringsAsFactors = F)
   adm$id <- rownames(adm)
