@@ -119,9 +119,9 @@ run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, ela
   setwd(workdir)
   cmd <- paste(elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
   system(cmd)
-  outdir <- file.path(el)
-  file.copy("./output", workdir, recursive = T, overwrite = T)
-  file.remove("./output")
+  outdir <- file.path(workdir, "output")
+  file.copy(outdir, workdir, recursive = T, overwrite = T)
+  file.remove(outdir)
   setwd(ini_dir)
   return(workdir)
 }
