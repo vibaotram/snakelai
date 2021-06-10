@@ -8,16 +8,15 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(eval = TRUE)
-# mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
-# .libPaths(mylib)
-# dir.create(mylib, showWarnings = F)
 if (!requireNamespace("DT", quietly = TRUE)) install.packages('DT', repos = "https://cloud.r-project.org")
 if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages('ggplot2', repos = "https://cloud.r-project.org")
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org")
 if (!requireNamespace("data.table", quietly = TRUE)) install.packages('data.table', repos = "https://cloud.r-project.org")
+if (!requireNamespace("rslurm", quietly = TRUE)) install.packages('rslurm', repos = "https://cloud.r-project.org")
 library(DT)
 library(dplyr)
 library(ggplot2)
+library(rslurm)
 library(data.table)
 ```
 
@@ -85,12 +84,15 @@ read_elai <- function(elai_outdir) {
 ```{r elai_input}
 elai_dir <- snakemake@params$workdir
 source_files <- snakemake@input$source
-source_param <- do.call(paste, 
-                        list(lapply(1:length(source_files), function(f) {
-                          id <- f-1
-                          par <- paste0("-g ", source_files[f], " -p 1", id)
-                          return(par)}),
-                          collapse = " "))
+source_param <- do.call(paste,
+                        list(
+                          lapply(1:length(source_files), function(f) {
+                            id <- f-1
+                            par <- paste0("-g ", source_files[f], " -p 1", id)
+                            return(par)}),
+                          collapse = " "
+                          )
+                        )
 test_file <- snakemake@input$test_file
 pos_dir <- dirname(snakemake@input$snp_file)
 pos_files <- list.files(pos_dir, "*.pos", full.names = T)
@@ -115,7 +117,7 @@ run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, ela
   batch <- gsub("test_|.pos", "", basename(pos))
   workdir <- file.path(elai_dir, batch)
   setwd(workdir)
-  cmd <- paste(elai, source_params, "-g", test_file, "-p 1", "-pos", pos_file, "-o elai_r", "-C", upper_layer, opts)
+  cmd <- paste(elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
   system(cmd)
   outdir <- file.path(el)
   file.copy("./output", workdir, recursive = T, overwrite = T)

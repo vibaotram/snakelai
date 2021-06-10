@@ -4,6 +4,7 @@ import os
 import vcf
 import re
 
+
 # configfile: "config.yaml"
 
 
@@ -48,7 +49,7 @@ else:
 
 snp_selection = list(config['snp_selection'].keys())
 
-elai_params = list(config["elai_params"].keys())
+elai_params = list(config['elai_params'].keys())
 
 rule finish:
     input:
@@ -164,21 +165,12 @@ rule test_file:
 #
 # batchid = list(range(1, n_batch + 1))
 
-# def select_snps_output(wildcards):
-#     if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
-#         n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
-#         batch = list(range(1, n_batch + 1))
-#         select_snps_output = expand(os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test_{batch}.geno'), chromosome=wildcards.chromosome, batch=batch)
-#     else:
-#         select_snps_output = os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test.geno')
-#     return unpack(output)
-
 
 
 rule select_snps:
     input: rules.test_file.output.snp_file
     output:
-        os.path.join(outdir, 'test', '{chromosome}', "{snp_selection}", 'selection.done')
+        os.path.join(outdir, 'test', '{chromosome}', "{snp_selection}", 'select_snps.done')
         # select_snps_output
         # expand(os.path.join(outdir, "batch_{batchid}/snp_pos"), batchid = batchid)
     params:
@@ -193,7 +185,6 @@ rule select_snps:
     shell:
         """
         Rscript {params.script} -i {input} -o {output} -n {params.nb_snps} -w {params.window_size} {threads}
-        touch {output}
         """
 
 elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
@@ -201,134 +192,44 @@ elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 # test_genotype = config["test_genotype"]
 elai_ext = ["admix.txt", "em.txt", "log.txt", "ps21.txt", "snpinfo.txt"]
 
-# if random_snps:
-#     finish_input = expand(os.path.join(outdir, "batch_{batchid}/output_{elai_params}/elai_results.html"), batchid = batchid, elai_params = elai_params)
-# else:
-#     finish_input = expand(os.path.join(outdir, "final_results/output_{elai_params}/elai_results.html"), elai_params = elai_params)
-
-
-
-
-# for i in batchid:
-#     os.makedirs(os.path.join(outdir, "batch_{}".format(i)), exist_ok=True)
-#     start = 1000*(i-1)
-#     end = 1000*i
-#     snp_batch = snp_info[start:end]
-#     snp_batch.to_csv(os.path.join(outdir, "batch_{}/snp_pos".format(i)), sep='\t', header=False, index=False)
-
 # source_genotypes = rules.simulate_source.output
 # n_sources = len(source_genotypes)
-
-def snp_file(wildcards):
-    if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
-        n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
-        batch = list(range(1, n_batch + 1))
-        snp_file = os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test_{batch}.geno')
-    else:
-        snp_file = os.path.join(outdir, 'test', '{chromosome}', wildcards.snp_selection, 'test.geno')
-    return unpack(snp_file)
-
-
-def source_files(wildcards):
-    source_genotypes = expand(rules.simulate_source.output, chromosome=wildcards.chromosome, k = k)
-    n_sources = len(source_genotypes)
-    source_files = ""
-    for i in range(0, n_sources):
-        file = source_genotypes[i]
-        source_files+= "-g {file} -p 1{i} ".format(file=file, i=i)
-    return unpack(source_files)
-
-def elai_output(wildcards):
-    if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
-        n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
-        batch = list(range(1, n_batch + 1))
-        output = expand(os.path.join(outdir, "elai", "{chromosome}", "{snp_selection}", "{batch}", "{elai_params}", "elai_r.{elai_ext}"), chromosome="{chromosome}", snp_selection="{snp_selection}", batch="{batch}", elai_params="{elai_params}", elai_ext=elai_ext)
-    else:
-        output = expand(os.path.join(outdir, "elai", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_r.{elai_ext}"), chromosome="{chromosome}", snp_selection="{snp_selection}", elai_params="{elai_params}", elai_ext=elai_ext)
-    return unpack(output)
-
-def elai_log(wildcards):
-    if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
-        n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
-        batch = list(range(1, n_batch + 1))
-        log = "elai_{chromosome}_{elai_params}_{snp_selection}_{batch}"
-    else:
-        log = "elai_{chromosome}_{elai_params}_{snp_selection}"
-    return unpack(log)
-
-snp_sets = []
-for s in snp_selection:
-    if config["snp_selection"][s]["nb_snps"] == "all":
-        for c in chromosome:
-            n_batch = math.ceil(source_vcf_reader.contigs[c].length/config["snp_selection"][s]["window_size"])
-            batch = list(range(1, n_batch + 1))
-            snp_sets.append(expand(os.path.join(outdir, 'test', c, s, 'test_{batch}.geno'), batch=batch))
-    else:
-        for c in chromosome:
-            snp_sets.append(os.path.join(outdir, 'test', c, s, 'test.geno'))
+# source_files = ""
+# for i in range(0, n_sources):
+#     file = os.path.dirname(source_genotypes[i])
+#     source_files+= "-g {file} -p 1{i} ".format(file=file, i=i)
 
 rule elai:
     input:
-        source_genotypes = rules.simulate_source.output,
+        source_files = rules.simulate_source.output,
         test_file = rules.test_file.output.test_file,
         snp_file = rules.select_snps.output,
     output:
+        os.path.join(outdir, "elai_results", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_results.html")
         # expand(os.path.join(outdir, "batch_{batchid}/output_{elai_params}/elai_r.{elai_ext}"), batchid = "{batchid}", elai_params = "{elai_params}", elai_ext = elai_ext)
-        expand(os.path.join(outdir, "elai", "{chromosome}", "snp_selection", "{elai_params}", "elai_r.{elai_ext}"), chromosome= "{chromosome}", snp_selection="{snp_selection}", elai_params = "{elai_params}", elai_ext=elai_ext)
+        # expand(os.path.join(outdir, "elai", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_r.{elai_ext}"), chromosome= "{chromosome}", snp_selection="{snp_selection}", elai_params = "{elai_params}", elai_ext=elai_ext)
     params:
-        source_files = source_files,
-        snp_file = os.path.join(outdir, "elai", "{chromosome}", "snp_selection", "test{batch}.geno"),
-        upper = lambda wildcards, input: len(input.source_genotypes),
         options = lambda wildcards: config["elai_params"][wildcards.elai_params],
         # out_dir = lambda wildcards, output: os.path.basename(os.path.dirname(output[0])),
-        workdir = lambda wildcards, output: os.path.dirname(output[0]),
-        logname = elai_log,
+        workdir = os.path.join(outdir, "elai", "{chromosome}", "{snp_selection}", "{elai_params}"),
+        logname = "elai_{chromosome}_{snp_selection}_{elai_params}",
         logdir = os.path.join(outdir, "log")
     resources:
         mem_gb = config["elai_mem_gb"]
-    shell:
-        """
-        cd {params.workdir}
-        echo $({elai} \\
-        {params.source_files} \\
-        -g {input.test_file} -p 1 \\
-        -pos {input.snp_file} \\
-        -o elai_r \\
-        -C {params.upper} {params.options})
-
-        mv output/* ./
-        rm -rf output
-        """
-
-# if random_snps:
-#     aggregate_outdir = os.path.join(outdir, "batch_{batchid}")
-# else:
-#     aggregate_outdir = os.path.join(outdir, "final_results")
-
-def read_elai_input(wildcards):
-    if config["snp_selection"][wildcards.snp_selection]["nb_snps"] == "all":
-        n_batch = math.ceil(source_vcf_reader.contigs[wildcards.chromosome].length/config["snp_selection"][wildcards.snp_selection]["window_size"])
-        batch = list(range(1, n_batch + 1))
-        input = expand(rules.elai.output, chromosome="{chromosome}", snp_selection="{snp_selection}", batch="{batch}", elai_params="{elai_params}", elai_ext=["admix.txt", "ps21.txt"])
-    else:
-        input = expand(rules.elai.output, chromosome="{chromosome}", snp_selection="{snp_selection}", elai_params="{elai_params}", elai_ext=["admix.txt", "ps21.txt"])
-    return unpack(input)
-
-
-rule read_elai:
-    input: read_elai_input
-        # expand(rules.elai.output, chromosome = "{chromosome}", elai_params = "{elai_params}", elai_ext = ["admix.txt", "ps21.txt"])
-    output: os.path.join(outdir, "elai_results", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_results.html")
-    params:
-        elai_options = lambda wildcards: config["elai_params"][wildcards.elai_params],
-        adm_file = lambda wildcards, output: os.path.join(os.path.dirname(output[0]), "overall_admixture.tsv"),
-        dosage_file = lambda wildcards, output: os.path.join(os.path.dirname(output[0]), "local_dosage.tsv"),
-        # true_dosage_file = config["true_inference"],
-        # genome_file = config["genome"],
-        logname = "read_elai_{chromosome}_{elai_params}",
-        logdir = os.path.join(outdir, "log")
     conda: "conda/conda_rmarkdown.yaml"
-    script: "script/read_elai.Rmd"
+    script: "script/elai.Rmd"
 
-rule test:
-    shell: "echo {source_files}"
+
+# rule read_elai:
+#     input: expand(rules.elai.output, chromosome = "{chromosome}", snp_selection="{snp_selection}", elai_params = "{elai_params}", elai_ext = ["admix.txt", "ps21.txt"])
+#     output: os.path.join(outdir, "elai_results", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_results.html")
+#     params:
+#         elai_options = lambda wildcards: config["elai_params"][wildcards.elai_params],
+#         adm_file = lambda wildcards, output: os.path.join(os.path.dirname(output[0]), "overall_admixture.tsv"),
+#         dosage_file = lambda wildcards, output: os.path.join(os.path.dirname(output[0]), "local_dosage.tsv"),
+#         # true_dosage_file = config["true_inference"],
+#         # genome_file = config["genome"],
+#         logname = "read_elai_{chromosome}_{snp_selection}_{elai_params}",
+#         logdir = os.path.join(outdir, "log")
+#     conda: "conda/conda_rmarkdown.yaml"
+#     script: "script/read_elai.Rmd"

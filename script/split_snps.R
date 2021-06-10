@@ -9,60 +9,79 @@ mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
 # if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
 library(dplyr, lib.loc = mylib)
 library(parallel, lib.loc = mylib)
+library(optparse, lib.loc = mylib)
 
-args <- commandArgs(trailingOnly = TRUE)
+option_list <- list(
+  make_option(c("-i", "--input"),
+              type = "character",
+              help = "input file"),
+  make_option(c("-o", "--output"),
+              type = "character",
+              help = "output file"),
+  make_option(c("-n", "--nb_snps"),
+              type = "character",
+              help = "number of snps"),
+  make_option(c("-w", "--window_size"),
+              type = "integer",
+              help = "window length"),
+  make_option(c("-t", "--threads"),
+              type = "integer",
+              help = "number of threads")
+)
 
-snp_file <- args[1] #as.character(snakemake@input)
+myArgs <- parse_args(
+  OptionParser(usage = "%prog [-i input] [-o output] [-n nb_snps] [-w window_size] [-t threads]",
+  option_list = option_list)
+  )
 
-output <- args[2] #as.character(snakemake@output)
+cores <- myArgs$threads
+
+snp_file <- myArgs$input #as.character(snakemake@input)
+
+output <- myArgs$output #as.character(snakemake@output)
+outdir <- dirname(output)
+dir.create(outdir, showWarnings = F)
 
 snp_info <- read.csv(snp_file, header = F, stringsAsFactors = F)
 colnames(snp_info) <- c("id", "pos", "chr")
 
-# random_snps <- snakemake@params$random_snps
-random_snps <- TRUE
-
-# snp_den <- snakemake@params$snp_den
-snp_den <- c(args[3], args[4]) # c(snakemake@params$nb_snps, snakemake@params$chrom_length)
-
-# batch <- as.numeric(snakemake@params$batch)
-# size <- as.numeric(snakemake@params$batch_size)
-batch <- 1
-size <-  args[4] #snakemake@params$chrom_length
-
-cores <-  args[5] #as.numeric(snakemake@threads)
+n_snp <- myArgs$nb_snps
+size <- as.numeric(myArgs$window_size)
+if (nb_snps == "all") {
+  batch <- ceiling(max(snp_info$pos)/size)
+} else {
+    n_snp <- as.numeric(n_snp)
+    batch <- 1
+}
 
 # print(batch)
+###--->>> fix this code block
 for (b in batch) {
   dir.create(dirname(output[b]), showWarnings = F)
-  if (isTRUE(random_snps)) {
-    if (is.null(snp_den) || length(snp_den) != 2) {
-      snp_batch <- snp_info[sort(sample(1:nrow(snp_info), size)),]
-    } else {
-      n_snp <- as.numeric(args[3])
-      size <- as.numeric(args[4])
-      chr_seq <- seq(1, max(snp_info$pos), size)
-      seq_ind <- seq_along(chr_seq)
-      sample_pos <- mclapply(seq_ind, function(i) {
-        if (i < max(seq_ind)) {
-          pos <- snp_info$pos[snp_info$pos %in% c(chr_seq[i]:(chr_seq[i+1]-1))]
-        } else {
-          pos <- snp_info$pos[snp_info$pos > chr_seq[i]]
-        }
-        n_snp <- ifelse(n_snp > length(pos), length(pos), n_snp)
-        s <- sample(pos, size = n_snp)
-        return(s)
-      }, mc.cores = cores, mc.preschedule = F) %>% unlist
-      snp_batch <- snp_info %>% filter(pos %in% sample_pos)
-    }
+  if (is.numeric(n_snp)) {
+    chr_seq <- seq(1, max(snp_info$pos), size)
+    seq_ind <- seq_along(chr_seq)
+    sample_pos <- mclapply(seq_ind, function(i) {
+      if (i < max(seq_ind)) {
+        pos <- snp_info$pos[snp_info$pos %in% c(chr_seq[i]:(chr_seq[i+1]-1))]
+      } else {
+        pos <- snp_info$pos[snp_info$pos > chr_seq[i]]
+      }
+      n_snp <- ifelse(n_snp > length(pos), length(pos), n_snp)
+      s <- sample(pos, size = n_snp)
+      return(s)
+    }, mc.cores = cores, mc.preschedule = F) %>% unlist
+    snp_batch <- snp_info %>% filter(pos %in% sample_pos)
+  }
 
   } else {
     start <- size*(b-1) + 1
     end <- size*b
     if (end > nrow(snp_info)) end <- nrow(snp_info)
-
     snp_batch <- snp_info[start:end,]
   }
 
-  write.table(snp_batch, output[b], sep = ",", row.names = F, col.names = F, quote = F)
+  write.table(snp_batch, file.path(outdir, paste0("test_", b, ".pos")), sep = ",", row.names = F, col.names = F, quote = F)
 }
+
+file.create(output)
