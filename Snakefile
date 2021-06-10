@@ -90,7 +90,7 @@ rule simulate_source:
         logname = "simulate_source_{chromosome}",
         logdir = os.path.join(outdir, "log")
     threads: config['simulate_cores']
-    singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
+    singularity: "shub://vibaotram/singularity-container:myr_4-0-2_rstudio_1.3"
     shell:
         """
         Rscript {params.script} -o {params.output} -i {input} -g {params.nb_groups} -n {params.nb_genotypes} -t {threads}
@@ -140,7 +140,7 @@ rule test_file:
         logname = "test_file_{chromosome}",
         logdir = os.path.join(outdir, "log")
     # conda: "conda/conda_rmarkdown.yaml"
-    singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
+    singularity: "shub://vibaotram/singularity-container:myr_4-0-2_rstudio_1.3"
     shell:
         """
         Rscript {params.script} {output.test_file} {output.snp_file} {input}
@@ -181,7 +181,7 @@ rule select_snps:
         logdir = os.path.join(outdir, "log")
     threads: config['split_snps_cores']
     # conda: "conda/conda_rmarkdown.yaml"
-    singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
+    singularity: "shub://vibaotram/singularity-container:myr_4-0-2_rstudio_1.3"
     shell:
         """
         Rscript {params.script} -i {input} -o {output} -n {params.nb_snps} -w {params.window_size} -t {threads}
@@ -216,6 +216,7 @@ rule elai:
         logname = "elai_{chromosome}_{snp_selection}_{elai_params}",
         logdir = os.path.join(outdir, "log"),
         mem_gb = config["elai_mem_gb"]
+    singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
     conda: "conda/conda_rmarkdown.yaml"
     script: "script/elai.Rmd"
 
