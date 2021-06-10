@@ -117,7 +117,8 @@ run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, ela
   # ini_dir <- getwd()
   batch <- gsub("test_|.pos", "", basename(as.character(pos)))
   workdir <- file.path(elai_dir, batch)
-  cmd <- paste(elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
+  dir.create(workdir, showWarnings = F)
+  cmd <- paste("cd", workdir, "&&", elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
   system(cmd)
   file.copy("output", workdir, recursive = T, overwrite = T)
   file.remove("output")
@@ -134,12 +135,12 @@ parse_jobname <- function(pos_file) {
 
 logname <- snakemake@params$logname
 logdir <- snakemake@params$logdir
-logfile <- file.path(logdir, "slurm", paste0(logname, "_%j.log"))
+logfile <- file.path(logdir, "slurm", "%x_%j.log"))
 
 submit_elai <- lapply(1:nrow(all_params), function(i) {
   job_name <- parse_jobname(as.character(all_params$pos[i]))
   slurm_apply(run_elai, all_params[i,], submit = T,
-              jobname = job_name,
+              jobname = job_name, sh_template = "script/submit_elai_sh.txt",
               slurm_options = list("output" = logfile, "error" = logfile, "mem" = paste0(mem,"G")))
 })
 ```
