@@ -172,7 +172,7 @@ elai_results <- lapply(submit_elai, function(j) {
 #   return(list("oveall_admixture" = adm, "ancestral_dosage" = dosage))
 # })
 
-outdir <- dirname(snakemake@output)
+outdir <- dirname(as.character(snakemake@output))
 all_adm <- do.call(rbind, lapply(elai_results, function(x) {
   a <- x$oveall_admixture
   return(a)
