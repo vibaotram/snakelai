@@ -114,16 +114,13 @@ all_params <- data.frame(source = source_param,
 
 ```{r run_elai}
 run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, elai) {
-  ini_dir <- getwd()
+  # ini_dir <- getwd()
   batch <- gsub("test_|.pos", "", basename(as.character(pos)))
   workdir <- file.path(elai_dir, batch)
-  setwd(workdir)
   cmd <- paste(elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
   system(cmd)
-  outdir <- file.path(workdir, "output")
-  file.copy(outdir, workdir, recursive = T, overwrite = T)
-  file.remove(outdir)
-  setwd(ini_dir)
+  file.copy("output", workdir, recursive = T, overwrite = T)
+  file.remove("output")
   return(workdir)
 }
 
