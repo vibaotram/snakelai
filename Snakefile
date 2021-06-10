@@ -35,7 +35,7 @@ outdir = config["outdir"]
 
 source_vcf = config['source_vcf']
 source_name = os.path.splitext(os.path.splitext(os.path.basename(source_vcf))[0])[0]
-vcftools_module = 'bioinfo/vcftools/0.1.16'
+vcftools_module = config['vcftools']
 
 chromosome = config['chromosome']
 source_vcf_reader = vcf.Reader(open(source_vcf, 'r'))
