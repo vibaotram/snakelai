@@ -184,7 +184,7 @@ rule select_snps:
     singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
-        Rscript {params.script} -i {input} -o {output} -n {params.nb_snps} -w {params.window_size} {threads}
+        Rscript {params.script} -i {input} -o {output} -n {params.nb_snps} -w {params.window_size} -t {threads}
         """
 
 elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
