@@ -13,40 +13,16 @@ library(parallel, lib.loc = mylib)
 library(vcfR, lib.loc = mylib)
 library(adegenet, lib.loc = mylib)
 library(data.table, lib.loc = mylib)
-library(optparse, lib.loc = mylib)
-
-option_list <- list(
-  make_option(c("-t", "--test"),
-              type = "character",
-              help = "test file"),
-  make_option(c("-s", "--snp"),
-              type = "character",
-              help = "snp file"),
-  make_option(c("-g", "--genotype_id"),
-              type = "character",
-              help = "genotype id"),
-  make_option(c("-v", "--vcf"),
-              type = "integer",
-              help = "vcf file"),
-  make_option(c("-t", "--threads"),
-              type = "integer",
-              help = "number of threads")
-)
-
-myArgs <- parse_args(
-  OptionParser(usage = "%prog [-i input] [-o output] [-n nb_snps] [-w window_size] [-t threads]",
-               option_list = option_list)
-)
 
 source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
 
-# args <- commandArgs(trailingOnly = TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 
-test_file <- myArgs$test #snakemake@output$test_file
-snp_file <- myArgs$snp #snakemake@output$snp_file
-genotype_id <- myArgs$genotype_id #snakemake@params$genotype_id
-vcf_file <- myArgs$vcf #snakemake@input
-cores <- myArgs$threads
+test_file <- args[1] #snakemake@output$test_file
+snp_file <- args[2] #snakemake@output$snp_file
+# genotype_id <- args[3] #snakemake@params$genotype_id
+vcf_file <- args[3] #snakemake@input
+# cores <- args[5]
 
 
 
