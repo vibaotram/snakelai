@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+#SBATCH --job-name={{{jobname}}}
 #SBATCH --array=0-{{{max_node}}}{{{job_array_task_limit}}}
 #SBATCH --cpus-per-task=1
 {{#flags}}
