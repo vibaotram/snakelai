@@ -62,9 +62,9 @@ rule split_source_chrom:
     params:
         logname = "split_source_chrom_{chromosome}",
         logdir = os.path.join(outdir, "log")
-    # envmodules: vcftools_module
-    conda: "conda/conda_vcftools.yaml"
-    singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
+    envmodules: vcftools_module
+    # conda: "conda/conda_vcftools.yaml"
+    # singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
     shell:
         """
         cd $(dirname {output})
@@ -123,9 +123,9 @@ rule split_test_chrom:
         indv = vcftools_indv,
         logname = "split_test_chrom_{chromosome}",
         logdir = os.path.join(outdir, "log")
-    # envmodules: vcftools_module
-    conda: "conda/conda_vcftools.yaml"
-    singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
+    envmodules: vcftools_module
+    # conda: "conda/conda_vcftools.yaml"
+    # singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
     shell:
         """
         cd $(dirname {output})
@@ -220,7 +220,7 @@ rule elai:
         logname = "elai_{chromosome}_{snp_selection}_{elai_params}",
         logdir = os.path.join(outdir, "log"),
         mem_gb = config["elai_mem_gb"]
-    singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
+    # singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
     conda: "conda/conda_rmarkdown.yaml"
     script: "script/elai.Rmd"
 
