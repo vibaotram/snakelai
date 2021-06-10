@@ -100,6 +100,7 @@ upper_layer <- length(source_files)
 opts <- snakemake@params$options
 mem <- snakemake@resources$mem_gb
 
+# elai <- snakemake@params$elai
 elai <- "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 
 all_params <- data.frame(source = source_param,
@@ -139,8 +140,9 @@ logdir <- snakemake@params$logdir
 logfile <- file.path(logdir, "slurm", paste0(logname, "_%j.log"))
 
 submit_elai <- lapply(1:nrow(all_params), function(i) {
+  job_name <- parse_jobname(as.character(all_params$pos[i]))
   slurm_apply(run_elai, all_params[i,], submit = T,
-              jobname = parse_jobname(all_params$pos[i]),
+              jobname = job_name,
               slurm_options = list("output" = logfile, "error" = logfile, "mem" = paste0(mem,"G")))
 })
 ```
