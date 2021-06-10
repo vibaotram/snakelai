@@ -135,7 +135,7 @@ parse_jobname <- function(pos_file) {
 
 logname <- snakemake@params$logname
 logdir <- snakemake@params$logdir
-logfile <- file.path(logdir, "slurm", "%x_%j.log"))
+logfile <- file.path(logdir, "slurm", "%x_%j.log")
 
 submit_elai <- lapply(1:nrow(all_params), function(i) {
   job_name <- parse_jobname(as.character(all_params$pos[i]))
