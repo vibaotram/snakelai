@@ -72,8 +72,6 @@ for (b in batch) {
       return(s)
     }, mc.cores = cores, mc.preschedule = F) %>% unlist
     snp_batch <- snp_info %>% filter(pos %in% sample_pos)
-  }
-
   } else {
     start <- size*(b-1) + 1
     end <- size*b
