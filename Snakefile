@@ -132,7 +132,7 @@ rule test_file:
     input: rules.split_test_chrom.output
     output:
         test_file = os.path.join(outdir, 'test', '{chromosome}', 'test_{chromosome}.geno'),
-        snp_file = os.path.join(outdir, 'pos', '{chromosome}', 'all_snp.geno')
+        snp_file = os.path.join(outdir, 'pos', '{chromosome}', 'all_snp.pos')
     threads: 1 #config['split_snps_cores']
     params:
         # genotype_id = genotype_id,
