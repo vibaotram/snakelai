@@ -216,7 +216,7 @@ rule elai:
         logname = "elai_{chromosome}_{snp_selection}_{elai_params}",
         logdir = os.path.join(outdir, "log"),
         mem_gb = config["elai_mem_gb"]
-    singularity: config['singularity']
+    singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
     conda: "conda/conda_rmarkdown.yaml"
     script: "script/elai.Rmd"
 
