@@ -47,7 +47,7 @@ colnames(snp_info) <- c("id", "pos", "chr")
 
 n_snp <- myArgs$nb_snps
 size <- as.numeric(myArgs$window_size)
-if (nb_snps == "all") {
+if (n_snp == "all") {
   batch <- ceiling(max(snp_info$pos)/size)
 } else {
     n_snp <- as.numeric(n_snp)
