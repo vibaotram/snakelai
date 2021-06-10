@@ -44,6 +44,8 @@ simulate_cores: 10
 ####################
 #### ELAI PARAMS
 # elai_source: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+elai: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+
 elai_params:
   c5_mg20: "-c 5 -mixgen 20 --exclude-nopos --exclude-miss1"
   #c5_mg10_s60: "-c 5 -mixgen 10 -s 60 --exclude-nopos --exclude-miss1"

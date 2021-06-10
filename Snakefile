@@ -187,7 +187,7 @@ rule select_snps:
         Rscript {params.script} -i {input} -o {output} -n {params.nb_snps} -w {params.window_size} -t {threads}
         """
 
-elai = "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+elai = config['elai']
 # source_genotypes = config["source_genotypes"]
 # test_genotype = config["test_genotype"]
 elai_ext = ["admix.txt", "em.txt", "log.txt", "ps21.txt", "snpinfo.txt"]
@@ -209,12 +209,12 @@ rule elai:
         # expand(os.path.join(outdir, "batch_{batchid}/output_{elai_params}/elai_r.{elai_ext}"), batchid = "{batchid}", elai_params = "{elai_params}", elai_ext = elai_ext)
         # expand(os.path.join(outdir, "elai", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_r.{elai_ext}"), chromosome= "{chromosome}", snp_selection="{snp_selection}", elai_params = "{elai_params}", elai_ext=elai_ext)
     params:
+        elai = elai,
         options = lambda wildcards: config["elai_params"][wildcards.elai_params],
         # out_dir = lambda wildcards, output: os.path.basename(os.path.dirname(output[0])),
         workdir = os.path.join(outdir, "elai", "{chromosome}", "{snp_selection}", "{elai_params}"),
         logname = "elai_{chromosome}_{snp_selection}_{elai_params}",
-        logdir = os.path.join(outdir, "log")
-    resources:
+        logdir = os.path.join(outdir, "log"),
         mem_gb = config["elai_mem_gb"]
     conda: "conda/conda_rmarkdown.yaml"
     script: "script/elai.Rmd"

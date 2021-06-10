@@ -14,7 +14,7 @@ library(vcfR, lib.loc = mylib)
 library(adegenet, lib.loc = mylib)
 library(data.table, lib.loc = mylib)
 
-source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
+source("script/geno_functions.R")
 
 args <- commandArgs(trailingOnly = TRUE)
 
