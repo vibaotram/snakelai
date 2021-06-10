@@ -117,7 +117,7 @@ run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, ela
   # ini_dir <- getwd()
   batch <- gsub("test_|.pos", "", basename(as.character(pos)))
   workdir <- file.path(elai_dir, batch)
-  dir.create(workdir, showWarnings = F)
+  dir.create(workdir, showWarnings = F, recursive = T)
   cmd <- paste("cd", workdir, "&&", elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
   system(cmd)
   file.copy("output", workdir, recursive = T, overwrite = T)
