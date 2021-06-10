@@ -16,7 +16,7 @@ library(vcfR, lib.loc = mylib)
 library(adegenet, lib.loc = mylib)
 library(LEA, lib.loc = mylib)
 
-source("/data3/projects/vietcaf/baotram/scripts/robusta_vn/R/geno_functions.R", local = knitr::knit_global())
+source("script/geno_functions.R")
 
 option_list <- list(
   make_option(c("-o", "--output"),
@@ -95,7 +95,7 @@ chr_snps$ID <- paste(chr_snps$CHROM, chr_snps$POS, sep = "_")
 n_inds <- nb_genotypes
 n_snps <- nrow(chr_freq)/3
 
-for (v in 1:ncol(chr_freq)) {
+mclapply(1:ncol(chr_freq), function(v) {
   grp_elai_input <- out_files[v]
   ind_names <- paste0("group_", colnames(chr_freq)[v], "-", 1:n_inds)
   writeLines(c(n_inds, n_snps, paste(c("ID", ind_names), collapse = ",")), grp_elai_input)
@@ -109,4 +109,4 @@ for (v in 1:ncol(chr_freq)) {
     geno_li <- paste(c(snp_id, sml_gt), collapse = ",")
     cat(paste0(geno_li, "\n"), file = grp_elai_input, append = T)
   }, mc.cores = cores, mc.preschedule = F)
-}
+}, , mc.cores = ncol(chr_freq), mc.preschedule = F)
