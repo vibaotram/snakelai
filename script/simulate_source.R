@@ -101,12 +101,13 @@ mclapply(1:ncol(chr_freq), function(v) {
   writeLines(c(n_inds, n_snps, paste(c("ID", ind_names), collapse = ",")), grp_elai_input)
   freq <- chr_freq[,v] # get allele freq of the group
   geno <- matrix(nrow=n_inds, ncol=n_snps) # genotype matrix of the group
-  mclapply(1:n_snps, function (i) {
+  for (i in 1:n_snpsi) {
     # for locus i, frequencies of 0, 1, 2 genotype are in row 3i-2, 3i-1, 3i of freq matrix
     sml_geno <-  sample(c(0,1,2), n_inds, prob = c(freq[3*i-2], freq[3*i-1], freq[3*i]), replace = T)
     snp_id <- chr_gl@loc.names[i]
     sml_gt <- geno2elai_gt(sml_geno, chr_snps, snp_id)
     geno_li <- paste(c(snp_id, sml_gt), collapse = ",")
     cat(paste0(geno_li, "\n"), file = grp_elai_input, append = T)
-  }, mc.cores = cores, mc.preschedule = F)
+  }
+  return(v)
 }, , mc.cores = ncol(chr_freq), mc.preschedule = F)
