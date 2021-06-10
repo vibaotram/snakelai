@@ -146,7 +146,7 @@ submit_elai <- lapply(1:nrow(all_params), function(i) {
 ```
 
 ```{r read_elai}
-elai_results <- lapply(submit_elai, function(j)
+elai_results <- lapply(submit_elai, function(j) {
   elai_dir <- get_slurm_out(j, outtype = 'table', wait = T)
   elai_dir <- as.character(elai_dir)
   elai_res <- read_elai(elai_dir)
@@ -154,7 +154,7 @@ elai_results <- lapply(submit_elai, function(j)
   adm$id <- rownames(adm)
   dosage <- elai_res$ancestral_dosage
   return(list("oveall_admixture" = adm, "ancestral_dosage" = dosage))
-  )
+})
 
 # elai_results <- lapply(elai_dir, function(d) {
 #   elai_res <- read_elai(d)
