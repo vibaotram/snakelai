@@ -56,7 +56,7 @@ if (n_snp == "all") {
 
 # print(batch)
 ###--->>> fix this code block
-for (b in batch) {
+for (b in 1:batch) {
   dir.create(dirname(output[b]), showWarnings = F)
   if (is.numeric(n_snp)) {
     chr_seq <- seq(1, max(snp_info$pos), size)
