@@ -132,10 +132,10 @@ rule test_file:
     input: rules.split_test_chrom.output
     output:
         test_file = os.path.join(outdir, 'test', '{chromosome}', 'test_{chromosome}.geno'),
-        snp_file = os.path.join(outdir, 'test', '{chromosome}', 'all_snp.geno')
+        snp_file = os.path.join(outdir, 'pos', '{chromosome}', 'all_snp.geno')
     threads: 1 #config['split_snps_cores']
     params:
-        genotype_id = genotype_id,
+        # genotype_id = genotype_id,
         script = "script/create_test_file.R",
         logname = "test_file_{chromosome}",
         logdir = os.path.join(outdir, "log")
@@ -143,7 +143,7 @@ rule test_file:
     singularity: "/home/baotram/singularity-container_myr_4-0-2_rstudio_1.3.sif"
     shell:
         """
-        Rscript {params.script} -t {output.test_file} -s {output.snp_file} -g {params.genotype_id} -v {input} -t {threads}
+        Rscript {params.script} {output.test_file} {output.snp_file} {input}
         """
 
 ######################
@@ -170,7 +170,7 @@ rule test_file:
 rule select_snps:
     input: rules.test_file.output.snp_file
     output:
-        os.path.join(outdir, 'test', '{chromosome}', "{snp_selection}", 'select_snps.done')
+        os.path.join(outdir, 'pos', '{chromosome}', "{snp_selection}", 'select_snps.done')
         # select_snps_output
         # expand(os.path.join(outdir, "batch_{batchid}/snp_pos"), batchid = batchid)
     params:
