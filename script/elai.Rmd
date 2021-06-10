@@ -118,14 +118,17 @@ run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, ela
   batch <- gsub("test_|.pos", "", basename(as.character(pos)))
   workdir <- file.path(elai_dir, batch)
   dir.create(workdir, showWarnings = F, recursive = T)
-  markfile <- file.path(workdir, "elai.done")
-  if (file.exists(markfile)) {
+  markfile <- list.files(workdir, "elai_r.ps21.txt", recursive = T, full.names = T)
+  if (length(markfile) > 0) {
     echo "Elai has been done!"
   } else {
     cmd <- paste("cd", workdir, "&&", elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
   system(cmd)
-  file.copy("output", workdir, recursive = T, overwrite = T)
-  unlink("output", recursive = T)
+  outdir <- file.path(workdir, "output")
+  if (dir.exists(outdir)) {
+    file.copy(list.files(outdir, full.names = T, recursive = T), workdir, recursive = T, overwrite = T)
+  unlink(outdir, recursive = T)
+  }
   }
   return(workdir)
 }
