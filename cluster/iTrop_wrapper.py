@@ -34,11 +34,11 @@ except IndexError:
 output = f'--output {logdir}/{log}_%j.log'
 error = f'--error {logdir}/{log}_%j.log'
 
-try:
-    mem_gb = job_properties['resources']['mem_gb']
-    mem = f'--mem {mem_gb}G'
-except (IndexError, KeyError):
-    mem = ""
+# try:
+#     mem_gb = job_properties['resources']['mem_gb']
+#     mem = f'--mem {mem_gb}G'
+# except (IndexError, KeyError):
+#     mem = ""
 
 sbatch_params = ' '.join(['sbatch --parsable ', job_name, cpus_per_task, mem, ntasks, output, error])
 
@@ -64,4 +64,3 @@ with open(jobscript, "w") as j:
 os.system(cmdline)
 # print(cmdline)
 # sbatch --job-name {cluster.job-name} --partition {cluster.partition} --account {cluster.account} --cpus-per-task {cluster.cpus-per-task} --output {cluster.output} --error {cluster.error} snakejob.sh
-
