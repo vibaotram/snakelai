@@ -120,7 +120,7 @@ run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, ela
   dir.create(workdir, showWarnings = F, recursive = T)
   markfile <- list.files(workdir, "elai_r.ps21.txt", recursive = T, full.names = T)
   if (length(markfile) > 0) {
-    echo "Elai has been done!"
+    print("Elai has been done!")
   } else {
     cmd <- paste("cd", workdir, "&&", elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
   system(cmd)
