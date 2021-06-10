@@ -62,7 +62,9 @@ rule split_source_chrom:
     params:
         logname = "split_source_chrom_{chromosome}",
         logdir = os.path.join(outdir, "log")
-    envmodules: vcftools_module
+    # envmodules: vcftools_module
+    conda: "conda/conda_vcftools.yaml"
+    singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
     shell:
         """
         cd $(dirname {output})
