@@ -98,10 +98,10 @@ pos_dir <- dirname(snakemake@input$snp_file)
 pos_files <- list.files(pos_dir, "*.pos", full.names = T)
 upper_layer <- length(source_files)
 opts <- snakemake@params$options
-mem <- snakemake@params$mem_gb
+mem <- snakemake@resources$mem_gb
 
-# elai <- snakemake@params$elai
-elai <- "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+elai <- snakemake@params$elai
+# elai <- "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 
 all_params <- data.frame(source = source_param,
                          test = test_file,
@@ -120,7 +120,7 @@ run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, ela
   dir.create(workdir, showWarnings = F, recursive = T)
   markfile <- list.files(workdir, "elai_r.ps21.txt", recursive = T, full.names = T)
   if (length(markfile) > 0) {
-    print("Elai has been done!")
+    print(paste("elai result is in", workdir))
   } else {
     cmd <- paste("cd", workdir, "&&", elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
   system(cmd)
@@ -149,7 +149,7 @@ submit_elai <- lapply(1:nrow(all_params), function(i) {
   job_name <- parse_jobname(as.character(all_params$pos[i]))
   slurm_apply(run_elai, all_params[i,], submit = T,
               jobname = job_name, sh_template = "script/submit_elai_sh.txt",
-              slurm_options = list("output" = logfile, "error" = logfile, "mem" = paste0(mem,"G")))
+              slurm_options = list("output" = logfile, "error" = logfile, "mem" = paste0(mem,"G"), "partition" = "long"))
 })
 ```
 
@@ -202,7 +202,7 @@ DT::datatable(all_adm)
 # all_dosage$ancestry <- factor(all_dosage$ancestry, levels = c("group_ER", "group_OB", "group_C", "group_D", "group_AG"))
 for (i in unique(all_dosage$individual)) {
   gp <- ggplot(all_dosage %>% filter(individual == i)) +
-    geom_point(aes(x = pos, y = dosage, color = ancestry), size = 1.5, shape = 16, alpha = .5) +
+    # geom_point(aes(x = pos, y = dosage, color = ancestry), size = 1.5, shape = 16, alpha = .5) +
     geom_line(aes(x = pos, y = dosage, color = ancestry), alpha = .5) +
     scale_color_viridis_d(end = 0.9) +
     xlab(paste("position on chromosome", unique(all_dosage$chr))) +

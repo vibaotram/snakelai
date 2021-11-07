@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
 
-mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
-.libPaths(mylib)
+# mylib <- "/shared/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
+# .libPaths(mylib)
 # dir.create(mylib, showWarnings = F)
 
 # if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
@@ -48,7 +48,7 @@ colnames(snp_info) <- c("id", "pos", "chr")
 n_snp <- myArgs$nb_snps
 size <- as.numeric(myArgs$window_size)
 if (n_snp == "all") {
-  batch <- ceiling(max(snp_info$pos)/size)
+  batch <- ceiling(nrow(snp_info)/size)
 } else {
     n_snp <- as.numeric(n_snp)
     batch <- 1
