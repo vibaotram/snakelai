@@ -171,7 +171,7 @@ rule test_file:
 # batchid = list(range(1, n_batch + 1))
 
 rule select_snps:
-    input: rules.test_file.output.snp_file if SIM_SOURCE else config["snp_file"]
+    input: rules.test_file.output.snp_file if TEST_FILE == "" else config["snp_file"]
     output:
         os.path.join(outdir, 'pos', '{chromosome}', "{snp_selection}", 'select_snps.done')
         # select_snps_output
@@ -208,7 +208,7 @@ elai_ext = ["admix.txt", "em.txt", "log.txt", "ps21.txt", "snpinfo.txt"]
 rule elai:
     input:
         source_files = rules.simulate_source.output if SIM_SOURCE else config['source_files'],
-        test_file = rules.test_file.output.test_file if SIM_SOURCE else TEST_FILE,
+        test_file = rules.test_file.output.test_file if TEST_FILE == "" else TEST_FILE,
         snp_file = rules.select_snps.output,
     output:
         os.path.join(outdir, "elai_results", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_results.html")
