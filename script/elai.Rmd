@@ -100,8 +100,8 @@ upper_layer <- length(source_files)
 opts <- snakemake@params$options
 mem <- snakemake@params$mem_gb
 
-# elai <- snakemake@params$elai
-elai <- "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+elai <- snakemake@params$elai
+# elai <- "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 
 all_params <- data.frame(source = source_param,
                          test = test_file,

@@ -8,8 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(eval = TRUE)
-# mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
-# .libPaths(mylib)
+mylib <- "~/R/x86_64-pc-linux-gnu-library/4.0"
+.libPaths(mylib)
 # dir.create(mylib, showWarnings = F)
 if (!requireNamespace("DT", quietly = TRUE)) install.packages('DT', repos = "https://cloud.r-project.org")
 if (!requireNamespace("ggplot2", quietly = TRUE)) install.packages('ggplot2', repos = "https://cloud.r-project.org")

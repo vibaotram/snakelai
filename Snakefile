@@ -26,6 +26,10 @@ outdir = config["outdir"]
 
 
 
+SIM_SOURCE = config["simulate_source"]
+TEST_FILE = config["test_file"]
+
+
 # elai = config["elai_source"]
 
 ######################
@@ -33,19 +37,21 @@ outdir = config["outdir"]
 
 ###### SPLIT SOURCE GENOTYPES BY CHROMOSOME
 
-source_vcf = config['source_vcf']
-source_name = os.path.splitext(os.path.splitext(os.path.basename(source_vcf))[0])[0]
+vcf_file = config['vcf']
+source_name = os.path.splitext(os.path.splitext(os.path.basename(vcf_file))[0])[0]
 vcftools_module = config['vcftools']
 
-chromosome = config['chromosome']
-source_vcf_reader = vcf.Reader(open(source_vcf, 'r'))
-source_chromosome = unique_chrom(source_vcf_reader)
-if chromosome == '@':
+chrom_id= config['chromosome']
+vcf_reader = vcf.Reader(open(vcf_file, 'r'))
+source_chromosome = unique_chrom(vcf_reader)
+if chrom_id == '@':
     chromosome = source_chromosome
-elif not all(c in source_chromosome for c in chromosome):
-    raise ValueError('Specified chromosomes do not present in the source_vcf file')
+# elif not all(c in source_chromosome for c in chromosome):
+#     raise ValueError('Specified chromosomes do not present in the vcf file')
 else:
-    pass
+    chrom_id = [int(i) - 1 for i in chrom_id]
+    chromosome = [source_chromosome[i] for i in chrom_id]
+    # pass
 
 snp_selection = list(config['snp_selection'].keys())
 
@@ -57,7 +63,7 @@ rule finish:
         expand(os.path.join(outdir, "elai_results", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_results.html"), chromosome=chromosome, snp_selection=snp_selection, elai_params=elai_params)
 
 rule split_source_chrom:
-    input: source_vcf
+    input: vcf_file
     output: os.path.join(outdir, 'source', '{chromosome}', source_name+'_{chromosome}.recode.vcf')
     params:
         logname = "split_source_chrom_{chromosome}",
@@ -72,7 +78,6 @@ rule split_source_chrom:
         """
 
 ###### CREATE ELAI SOURCE FILE
-
 
 nb_groups = config['nb_groups']
 k = range(1, nb_groups+1)
@@ -103,17 +108,13 @@ rule simulate_source:
 ######################
 #### PREPARE TEST FILE AND SNP FILE
 
-test_vcf = config['test_vcf']
-genotype_id = config['genotype_id']
-if test_vcf == source_vcf:
-    test_vcf_reader = source_vcf_reader
-else:
-    test_vcf_reader = vcf.Reader(open(test_vcf, 'r'))
-if not all(id in test_vcf_reader.samples for id in genotype_id):
+test_vcf = config['vcf']
+test_id = config['test_id']
+if TEST_FILE == "" and not all(id in vcf_reader.samples for id in test_id):
     raise ValueError("Specified genotype IDs do not present in the test_vcf file")
 
 vcftools_indv = []
-for id in genotype_id:
+for id in test_id:
     vcftools_indv.append("--indv {id}".format(id=id))
 
 rule split_test_chrom:
@@ -139,7 +140,7 @@ rule test_file:
         snp_file = os.path.join(outdir, 'pos', '{chromosome}', 'all_snp.pos')
     threads: 1 #config['split_snps_cores']
     params:
-        # genotype_id = genotype_id,
+        # test_id = test_id,
         script = "script/create_test_file.R",
         logname = "test_file_{chromosome}",
         logdir = os.path.join(outdir, "log")
@@ -169,10 +170,8 @@ rule test_file:
 #
 # batchid = list(range(1, n_batch + 1))
 
-
-
 rule select_snps:
-    input: rules.test_file.output.snp_file
+    input: rules.test_file.output.snp_file if SIM_SOURCE else config["snp_file"]
     output:
         os.path.join(outdir, 'pos', '{chromosome}', "{snp_selection}", 'select_snps.done')
         # select_snps_output
@@ -203,10 +202,13 @@ elai_ext = ["admix.txt", "em.txt", "log.txt", "ps21.txt", "snpinfo.txt"]
 #     file = os.path.dirname(source_genotypes[i])
 #     source_files+= "-g {file} -p 1{i} ".format(file=file, i=i)
 
+
+
+
 rule elai:
     input:
-        source_files = rules.simulate_source.output,
-        test_file = rules.test_file.output.test_file,
+        source_files = rules.simulate_source.output if SIM_SOURCE else config['source_files'],
+        test_file = rules.test_file.output.test_file if SIM_SOURCE else TEST_FILE,
         snp_file = rules.select_snps.output,
     output:
         os.path.join(outdir, "elai_results", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_results.html")
@@ -220,10 +222,26 @@ rule elai:
         logname = "elai_{chromosome}_{snp_selection}_{elai_params}",
         logdir = os.path.join(outdir, "log"),
         mem_gb = config["elai_mem_gb"]
+    resources:
+        mem_gb = config["elai_mem_gb"]
     # singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"
     conda: "conda/conda_rmarkdown.yaml"
     script: "script/elai.Rmd"
 
+merged_snps = config["merged_snps"]
+merged_params = config["merged_params"]
+
+rule merge_elai:
+    input:
+        require = rules.finish.input,
+        # files = expand(rules.elai.output, chromosome = chromosome, snp_selection = merged_snps, elai_params = merged_params)
+    output: os.path.join(outdir, "Merged_ELAI_Results.html")
+    params:
+        merged_snps = merged_snps,
+        merged_params = merged_params,
+        genome_fa = config["genome"]
+    conda: "conda/conda_rmarkdown.yaml"
+    script: "script/merge_elai.Rmd"
 
 # rule read_elai:
 #     input: expand(rules.elai.output, chromosome = "{chromosome}", snp_selection="{snp_selection}", elai_params = "{elai_params}", elai_ext = ["admix.txt", "ps21.txt"])

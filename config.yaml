@@ -1,6 +1,13 @@
 #source_genotypes: ["/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_AG", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_C", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_D", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_ER", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_OB"]
 
 ####################
+#### SOFTWARE
+elai: "elai/elai-lin" # "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+vcftools: "vcftools"
+singularity: "shub://vibaotram/singularity-container:myr_4-0-2_rstudio_1.3.sif"
+
+
+####################
 #### INPUT FILES
 # source_genotypes: ["/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_AG", "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/group_ER"]
 
@@ -9,10 +16,13 @@
 # snp_file: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/input/snp.pos"
 
 genome: "/data3/projects/vietcaf/reference/CC1.8_v2_pseudomolecule_cat.fa" # fasta file
-test_vcf: "/data3/projects/vietcaf/baotram/vietcaf_general_DP_missing_indv_singletons_Filtered_biallelic.recode.vcf"
-source_vcf: "/data3/projects/vietcaf/baotram/vietcaf_general_DP_missing_indv_singletons_Filtered_biallelic.recode.vcf"
-genotype_id: ["TR6m"] # "@" for all genotypes or specific id
-chromosome: "@" # "@" for all chromosome or specific chroms
+source_files: [] # if simulate_source = FALSE, provide genotype file for each source
+vcf: "/data3/projects/vietcaf/baotram/vietcaf_general_DP_missing_indv_singletons_Filtered_biallelic.recode.vcf"
+# source_vcf: "/data3/projects/vietcaf/baotram/vietcaf_general_DP_missing_indv_singletons_Filtered_biallelic.recode.vcf"
+test_id: ["TR6m"] # "@" for all genotypes or specific id
+test_file: "" # if filled, test_id will be ignored
+snp_file: "" # obligator if test_file is provided, columns: id, pos, chrom
+chromosome: [1, 2, 6] # "@" for all chromosome or specific chroms
 
 ####################
 #### OUTPUT
@@ -26,6 +36,12 @@ outdir: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/snakemake/outpu
 # snp_den: [1, 500000] # random selection only, snp density: [nb snps, per kb]. if this object is set, batch_size will be ignored
 split_snps_cores: 20
 snp_selection:
+  10k:
+    nb_snps: 10000
+    window_size: "chrom"
+  100k:
+    nb_snps: 100000
+    window_size: "chrom"
   even:
     nb_snps: 1 # "all"/integer
     window_size: 5000 # "chrom"/integer
@@ -37,14 +53,15 @@ snp_selection:
 
 ######################
 #### SOURCE GENOTYPES SIMULATION
+simulate_source: FALSE # TRUE or FALSE
 nb_groups: 5
 nb_genotypes: 100 # nb of genotypes per group
 simulate_cores: 10
 
+
 ####################
 #### ELAI PARAMS
 # elai_source: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
-elai: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 
 elai_params:
   c5_mg20: "-c 5 -mixgen 20 --exclude-nopos --exclude-miss1"
@@ -52,4 +69,5 @@ elai_params:
 
 elai_mem_gb: 5
 
-true_inference: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/test_10_clones/optimize_elai/elai/input/true_inference.tsv" # tsv file, columns: "id", "ancestry", "true_dosage"
+merged_snps: ["even", "all"]
+merged_params: "c5_mg_20"

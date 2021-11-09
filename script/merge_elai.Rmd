@@ -1,0 +1,152 @@
+---
+title: "Final merged ELAI results"
+author: "Tram"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+```
+
+```{r}
+plot_elai <- function(snakedir, chrom, snp, param, groups = NULL , plot = F) {
+  all_dosage <- do.call(rbind, lapply(snp, function(s) {
+    result_data <- file.path(snakedir, "elai_results", chrom, s, param, "local_dosage.txt")
+    print(result_data)
+    all_dosage <- fread(result_data, sep = "\t", header = T, data.table = T)
+    all_dosage1 <- data.frame(all_dosage, snp = s)
+    return(all_dosage1)
+  }))
+  
+  all_dosage$ancestry <- factor(all_dosage$ancestry)
+  if (!is.null(groups)) levels(all_dosage$ancestry) <- groups
+  all_dosage$ancestry <- factor(all_dosage$ancestry, levels = c("group_ER", "group_OB", "group_C", "group_D", "group_AG"))
+  
+  if (isTRUE(plot)) {
+    p <- ggplot(all_dosage) +
+      facet_grid(rows = vars(individual)) +
+      # geom_point(aes(x = pos, y = dosage, color = ancestry), size = 1.5, shape = 16, alpha = .5) +
+      geom_line(aes(x = pos, y = dosage, color = ancestry, linetype = snp, alpha = snp)) +
+      scale_linetype_manual(values=c("dashed", "solid")) +
+      scale_color_viridis_d(end = 0.9) +
+      scale_alpha_manual(values = c(.8, 1)) +
+      xlab(paste("position on chromosome", unique(all_dosage$chr))) +
+      ylab("ancestral dosage")
+    print(p)
+  }
+  
+  # ggsave(paste0(chrom, ".svg"), width = 16, height = 9, dpi = 1000)
+  return(invisible(all_dosage))
+}
+
+rounding <- function(x) {
+  n <- sapply(x, function(i) {
+    if (i < 0.1) {
+      i <- 0
+    } else if (i > 0.4 && i < .6) {
+      i <- 0.5
+    } else if (i > 0.9) {
+      i <- 1
+    } else {
+      i <- NA
+    }
+  }, USE.NAMES = F, simplify = T)
+
+  return(n)
+}
+
+
+elai_GR <- function(all_dosage, gap = 1e6){
+  # rounding admixture
+  all_dosage <- all_dosage %>% 
+    mutate(dosage = rounding(dosage)) %>% 
+    arrange(snp, pos)
+  com_dosage <- reshape2::dcast(all_dosage, ... ~ snp, 
+                                value.var = "dosage")
+  # remove ambiguous positions
+  com_dosage <- na.omit(com_dosage)
+  # for each individual and each ancestry, 
+  # retain positions that have equal admixture
+  fin_dosage <- com_dosage %>% 
+    group_by(individual, ancestry) %>% 
+    arrange(pos) %>% 
+    rowwise() %>% 
+    filter(all == even)
+  elai_GR_list <- dosage2GR(fin_dosage = fin_dosage, gap_length = gap)
+  return(elai_GR_list)
+}
+# test_chr7 <- dose_chr7 %>% filter(pos < 10e4)
+# elai_GR(test_chr7)
+final_elai <- function(snakedir, chr, group_id) {
+  dose_chr1 <- plot_elai(snakedir, chr, group_id, plot = F)
+  elai_GR1 <- elai_GR(dose_chr1)
+  return(elai_GR1)
+}
+```
+
+
+```{r params}
+merged_snps <- snakemake@params$merged_snps
+merged_param <- snakemake@params$merged_param
+snake_outdir <- snakemake@outdir
+genome_fa <- snakemake@params$genome_fa
+test_chroms <- list.dirs(snake_outdir, recursive = F)
+```
+
+```{r read_elai}
+final_GR <- do.call(function(x) unlist(GRange), lapply(test_chroms, function(chr) {
+  dose_chr <- plot_elai(snakedir = snake_outdir, chrom = chr, groups = NULL, plot = F)
+  elai_GR_chr <- elai_GR(dose_chr, gap = 1e6)
+  return(elai_GR_chr)
+}))
+```
+
+```{r plot, fig.height=10, fig.width=15}
+# genome_fa <- "/data3/projects/vietcaf/reference/CC1.8_v2_pseudomolecule_cat.fa"
+genome <- scanFa(genome_fa)
+genome <- genome[grepl("Chr", names(genome))] # remove contigs
+names(genome) <- gsub(" .+", "", names(genome))
+genome_GR <- GRanges(seqnames = names(genome), ranges = IRanges(start = 1, end = width(genome)))
+
+
+group_col <- viridis(5, end = .9)
+names(group_col) <- c("group_ER", "group_OB", "group_C", "group_D", "group_AG")
+  
+# introgression windows
+for (id in unique(all_windows$individual)) {
+  all_windows_ind <- all_windows[all_windows$individual == id]
+  all_windows_large <- all_windows_ind[width(all_windows_ind) > 1e6,]
+  all_windows_small <- all_windows_ind[width(all_windows_ind) < 1e6,]
+  groups <- colnames(mcols(all_windows))[colnames(mcols(all_windows)) != "individual"]
+  
+  gkp <- plotKaryotype(genome = genome_GR, plot.type = 6, main = id) 
+  kpDataBackground(gkp, data.panel ="ideogram", color = "gray90")
+  kpAddBaseNumbers(gkp, tick.dist = 1e7)
+  for (g in 1:length(groups)) {
+    if (g == 1) {
+      ga <- 0
+      gz <- mcols(all_windows_large)[,groups[g]]
+    } else {
+      ga <- gz
+      gz <- gz+mcols(all_windows_large)[,groups[g]]
+    }
+      kpBars(gkp, data = all_windows_large, y0 = ga, y1 = gz, col = group_col[groups[g]], border = NA)
+  }
+  # for (g in 1:length(groups)) {
+  #   if (g == 1) {
+  #     # kpBars(gkp, data = all_windows_large, y0 = 0, y1 = mcols(all_windows_large)[,groups[g]], col = group_col[groups[g]], border = NA)
+  #     ga <- 0
+  #     gz <- mcols(all_windows_small)[,groups[g]]
+  #   } else {
+  #     ga <- gz
+  #     gz <- gz+mcols(all_windows_small)[,groups[g]]
+  #   }
+  #     kpBars(gkp, data = all_windows_small, y0 = ga, y1 = gz, col = group_col[groups[g]], border = NA)
+  # }
+  # kpPlotRegions(gkp, data = all_windows_large, data.panel = "ideogram", col = "black", avoid.overlapping = T)
+  # kpPlotRegions(gkp, data = all_windows_small, data.panel = "ideogram", col = "orange3", avoid.overlapping = T)
+}
+```
+

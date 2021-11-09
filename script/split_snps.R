@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 
-mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
+mylib <- "~/R/x86_64-pc-linux-gnu-library/4.0"
 .libPaths(mylib)
 # dir.create(mylib, showWarnings = F)
 
@@ -47,18 +47,18 @@ colnames(snp_info) <- c("id", "pos", "chr")
 
 n_snp <- myArgs$nb_snps
 size <- as.numeric(myArgs$window_size)
-if (n_snp == "all") {
+if (n_snp == "all" && size != "chrom") { # subset all snps
   batch <- ceiling(nrow(snp_info)/size)
-} else {
+} else { # random snps
     n_snp <- as.numeric(n_snp)
     batch <- 1
 }
 
 # print(batch)
-###--->>> fix this code block
+###--->>> fixing this code block
 for (b in 1:batch) {
   dir.create(dirname(output[b]), showWarnings = F)
-  if (is.numeric(n_snp)) {
+  if (is.numeric(n_snp) && size != "chrom") { # even sample
     chr_seq <- seq(1, max(snp_info$pos), size)
     seq_ind <- seq_along(chr_seq)
     sample_pos <- mclapply(seq_ind, function(i) {
@@ -68,11 +68,14 @@ for (b in 1:batch) {
         pos <- snp_info$pos[snp_info$pos > chr_seq[i]]
       }
       n_snp <- ifelse(n_snp > length(pos), length(pos), n_snp)
-      s <- sample(pos, size = n_snp)
+      s <- sample(pos, size = n_snp, replace = F)
       return(s)
     }, mc.cores = cores, mc.preschedule = F) %>% unlist
     snp_batch <- snp_info %>% filter(pos %in% sample_pos)
-  } else {
+  } else if (is.numeric(n_snp) && size == "chrom") { # random sample
+    sample_pos <- sample(n_snp, snp_info$pos, replace = F)
+    snp_batch <- snp_info %>% filter(pos %in% sample_pos)
+  } else { # subset of all snps
     start <- size*(b-1) + 1
     end <- size*b
     if (end > nrow(snp_info)) end <- nrow(snp_info)
