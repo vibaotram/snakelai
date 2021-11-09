@@ -145,20 +145,20 @@ mclapply(1:ncol(chr_freq), function(v) {
 # // [[Rcpp::export]]
 # NumericVector my_fun(){
 #   // calling rnorm()
-#   Function f("rnorm");   
-#   
+#   Function f("rnorm");
+#
 #   // Next code is interpreted as rnorm(n=5, mean=10, sd=2)
 #   return f(5, Named("sd")=2, _["mean"]=10);
 # }
 # a better way to call the R function
 # S4 rcpp_package_function(NumericMatrix m){
-#   
+#
 #   // Obtaining namespace of Matrix package
 #   Environment pkg = Environment::namespace_env("Matrix");
-#   
+#
 #   // Picking up Matrix() function from Matrix package
 #   Function f = pkg["Matrix"];
-#   
+#
 #   // Executing Matrix( m, sparse = TRIE )
 #   return f( m, Named("sparse", true));
 # }
