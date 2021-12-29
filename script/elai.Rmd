@@ -96,6 +96,9 @@ source_param <- do.call(paste,
 test_file <- snakemake@input$test_file
 pos_dir <- dirname(snakemake@input$snp_file)
 pos_files <- list.files(pos_dir, "*.pos", full.names = T)
+unsorted <- as.numeric(gsub("test_|.pos", "", basename(pos_files)))
+sorted <- sort(unsorted)
+pos_files <- pos_files[sapply(sorted, function(i) which(unsorted == i))]
 upper_layer <- length(source_files)
 opts <- snakemake@params$options
 mem <- snakemake@params$mem_gb
@@ -164,38 +167,42 @@ submit_elai <- lapply(1:nrow(all_params), function(i) {
 ```
 
 ```{r read_elai}
-elai_results <- lapply(submit_elai, function(j) {
+outdir <- dirname(as.character(snakemake@output))
+for (j in submit_elai) {
   elai_dir <- get_slurm_out(j, outtype = 'table', wait = T)
   print(elai_dir)
   elai_dir <- as.character(elai_dir[1,])
   print(elai_dir)
+  batch <- basename(elai_dir)
   elai_res <- read_elai(elai_dir)
-  adm <- data.frame(elai_res$oveall_admixture, "batch" = basename(elai_dir), stringsAsFactors = F)
-  adm$id <- rownames(adm)
-  dosage <- elai_res$ancestral_dosage
-  return(list("oveall_admixture" = adm, "ancestral_dosage" = dosage))
-})
-
-# elai_results <- lapply(elai_dir, function(d) {
-#   elai_res <- read_elai(d)
-#   adm <- data.frame(elai_res$oveall_admixture, "chromosome" = basename(dirname(d)), stringsAsFactors = F)
-#   dosage <- elai_res$ancestral_dosage
-#   return(list("oveall_admixture" = adm, "ancestral_dosage" = dosage))
-# })
-
-outdir <- dirname(as.character(snakemake@output))
-all_adm <- do.call(rbind, lapply(elai_results, function(x) {
-  a <- x$oveall_admixture
-  return(a)
-}))
-write.table(all_adm, file.path(outdir, "overall_admixture.txt"), sep = "\t", row.names = F, col.names = T)
-
-all_dosage <- do.call(rbind, lapply(elai_results, function(x) {
-  a <- x$ancestral_dosage
-  d <- do.call(rbind, lapply(names(a), function(n) data.frame(a[[n]], "individual" = n)))
-  return(d)
-}))
-write.table(all_dosage, file.path(outdir, "local_dosage.txt"), sep = "\t", row.names = F, col.names = T)
+  adm <- data.frame(elai_res$oveall_admixture, "batch" = batch, stringsAsFactors = F)
+  adm$individual <- rownames(adm)
+  dosage <- do.call(rbind, lapply(names(elai_res$ancestral_dosage),
+                                  function(d) data.frame(elai_res$ancestral_dosage[[d]],
+                                                         "individual" = d)))
+  dosage <- dosage %>% dplyr::arrange(pos)
+  for (ind in unique(rownames(adm))) {
+    adm_ind <- adm %>% dplyr::filter(individual == ind)
+    dosage_ind <- dosage %>% dplyr::filter(individual == ind)
+    if (batch == 1) {
+      cat("new")
+      fwrite(adm_ind, file.path(outdir, "overall_admixture.csv"),
+             sep = ",", row.names = T, col.names = T,
+             append = F)
+      fwrite(dosage_ind, file.path(outdir, "local_dosage.csv"),
+             sep = ",", row.names = F, col.names = T,
+             append = F)
+    } else {
+      cat("append")
+      fwrite(adm_ind, file.path(outdir, "overall_admixture.csv"),
+             sep = ",", row.names = T, col.names = F,
+             append = T)
+      fwrite(dosage_ind, file.path(outdir, "local_dosage.csv"),
+             sep = ",", row.names = F, col.names = F,
+             append = T)
+    }
+  }
+}
 ```
 
 ## elai parameters
