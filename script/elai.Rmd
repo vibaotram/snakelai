@@ -98,7 +98,7 @@ pos_dir <- dirname(snakemake@input$snp_file)
 pos_files <- list.files(pos_dir, "*.pos", full.names = T)
 upper_layer <- length(source_files)
 opts <- snakemake@params$options
-mem <- snakemake@resources$mem_gb
+mem <- snakemake@params$mem_gb
 
 elai <- snakemake@params$elai
 # elai <- "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
@@ -110,20 +110,22 @@ all_params <- data.frame(source = source_param,
                          other_params = opts,
                          elai_dir = elai_dir,
                          elai = elai)
+print(all_params)
 ```
 
 ```{r run_elai}
 run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, elai) {
   # ini_dir <- getwd()
+  print(elai_dir)
   batch <- gsub("test_|.pos", "", basename(as.character(pos)))
   workdir <- file.path(elai_dir, batch)
   dir.create(workdir, showWarnings = F, recursive = T)
-  markfile <- list.files(workdir, "elai_r.ps21.txt", recursive = T, full.names = T)
+  markfile <- list.files(workdir, "elai_r.ps21.txt", recursive = F, full.names = T)
   if (length(markfile) > 0) {
     print(paste("elai result is in", workdir))
   } else {
     cmd <- paste("cd", workdir, "&&", elai, source, "-g", test, "-p 1", "-pos", pos, "-o elai_r", "-C", upper_layer, other_params)
-  system(cmd)
+    system(cmd)
   }
   outdir <- file.path(workdir, "output")
   if (dir.exists(outdir)) {
@@ -133,11 +135,12 @@ run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, ela
   return(workdir)
 }
 
-parse_jobname <- function(pos_file) {
+parse_jobname <- function(pos_file, elai_dir) {
   batch <- gsub("test_|.pos", "", basename(pos_file))
   snp_selection <- basename(dirname(pos_file))
   chromosome <- basename(dirname(dirname(pos_file)))
-  jobname <- paste("elai", chromosome, snp_selection, batch, sep = "_")
+  param <- basename(elai_dir)
+  jobname <- paste("RSelai", chromosome, snp_selection, param, batch, sep = "_")
   return(jobname)
 }
 
@@ -145,17 +148,25 @@ logname <- snakemake@params$logname
 logdir <- snakemake@params$logdir
 logfile <- file.path(logdir, "slurm", "%x_%j.log")
 
+
+  
 submit_elai <- lapply(1:nrow(all_params), function(i) {
-  job_name <- parse_jobname(as.character(all_params$pos[i]))
+  job_name <- parse_jobname(pos_file = as.character(all_params$pos[i]), 
+                            elai_dir = as.character(all_params$elai_dir[i]))
   slurm_apply(run_elai, all_params[i,], submit = T,
               jobname = job_name, sh_template = "script/submit_elai_sh.txt",
-              slurm_options = list("output" = logfile, "error" = logfile, "mem" = paste0(mem,"G"), "partition" = "long"))
+              preschedule_cores = T,
+              slurm_options = list("output" = logfile, 
+                                   "error" = logfile, 
+                                   "mem" = paste0(mem,"G"), 
+                                   "partition" = "long"))
 })
 ```
 
 ```{r read_elai}
 elai_results <- lapply(submit_elai, function(j) {
   elai_dir <- get_slurm_out(j, outtype = 'table', wait = T)
+  print(elai_dir)
   elai_dir <- as.character(elai_dir[1,])
   print(elai_dir)
   elai_res <- read_elai(elai_dir)
@@ -189,58 +200,6 @@ write.table(all_dosage, file.path(outdir, "local_dosage.txt"), sep = "\t", row.n
 
 ## elai parameters
 ```{r elai_params}
-snakemake@params$elai_options
+snakemake@params$options
 ```
 
-## overall admixture
-```{r overall_adm}
-DT::datatable(all_adm)
-```
-
-## local ancestry inference
-```{r plot_lai, fig.height=8, fig.width=15}
-# all_dosage$ancestry <- factor(all_dosage$ancestry, levels = c("group_ER", "group_OB", "group_C", "group_D", "group_AG"))
-for (i in unique(all_dosage$individual)) {
-  gp <- ggplot(all_dosage %>% filter(individual == i)) +
-    # geom_point(aes(x = pos, y = dosage, color = ancestry), size = 1.5, shape = 16, alpha = .5) +
-    geom_line(aes(x = pos, y = dosage, color = ancestry), alpha = .5) +
-    scale_color_viridis_d(end = 0.9) +
-    xlab(paste("position on chromosome", unique(all_dosage$chr))) +
-    ylab("ancestral dosage") +
-    ggtitle(i)
-  print(gp)
-}
-```
-
-
-```{r, eval=FALSE}
-true_inference_file <- snakemake@params$true_dosage_file
-print_cor <- file.exists(true_inference_file)
-```
-
-
-```{r, eval=print_cor, eval=FALSE}
-knitr::asis_output("## correlation between estimated inference and true inference\\n")
-for (i in unique(all_dosage$individual)) {
-  true_dosage <- data.table::fread(true_inference_file, header = T, sep = "\t", stringsAsFactors = F)
-  cat(i, "\n")
-  test_dosage <- merge(all_dosage %>% filter(individual == i), true_dosage, by.x = c("rs", "ancestry"), by.y = c("id", "ancestry"), all.x = T)
-  test_dosage <- na.omit(test_dosage)
-  test_dosage <- test_dosage[test_dosage$ancestry == "group_ER",]
-  r <- cor(test_dosage$dosage, test_dosage$true_dosage, method = "pearson")
-  cat("r = ", r, "\n")
-}
-```
-
-
-## snps distribution
-```{r snps_distribution, fig.height=8, fig.width=15}
-# hist(unique(all_dosage$pos), breaks = 1000)
-ggplot(all_dosage %>% dplyr::distinct(pos)) +
-  geom_histogram(aes(x = pos), binwidth = 1e5) +
-  ylab("count per 100kb")
-```
-
-```{r save_data, include=FALSE}
-save(all_adm,all_dosage, file = file.path(outdir, "elai_results.RData"))
-```
