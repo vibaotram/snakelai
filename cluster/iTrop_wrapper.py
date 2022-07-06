@@ -36,9 +36,9 @@ error = f'--error {logdir}/{log}_%j.log'
 
 try:
     mem_gb = job_properties['resources']['mem_gb']
-    mem = f'--mem-per-cpu {mem_gb}G'
+    mem = f'--mem {mem_gb}G'
 except (IndexError, KeyError):
-    mem = ""
+    mem = "--mem 10G"
 
 sbatch_params = ' '.join(['sbatch --parsable -p long', job_name, cpus_per_task, mem, ntasks, output, error])
 

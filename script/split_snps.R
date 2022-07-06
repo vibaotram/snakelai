@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 
-mylib <- "~/R/x86_64-pc-linux-gnu-library/4.0"
+mylib <- "/shared/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
 .libPaths(mylib)
 # dir.create(mylib, showWarnings = F)
 

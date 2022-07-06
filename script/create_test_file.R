@@ -1,13 +1,14 @@
 #!/usr/bin/env Rscript
 
-mylib <- "~/R/x86_64-pc-linux-gnu-library/4.0"
+mylib <- "/shared/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
 .libPaths(mylib)
 # dir.create(mylib, showWarnings = F)
 
-# if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
-# if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
-# if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
-# if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org", dependencies = TRUE, lib = mylib, INSTALL_opts = "--no-lock")
+if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+if (!requireNamespace("data.table", quietly = TRUE)) install.packages('data.table', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org", dependencies = TRUE, lib = mylib, INSTALL_opts = "--no-lock")
 library(dplyr, lib.loc = mylib)
 library(parallel, lib.loc = mylib)
 library(vcfR, lib.loc = mylib)
@@ -38,7 +39,7 @@ vcf_R <- read.vcfR(vcf_file)
 # rownames(test_gt) <- genotype_id
 # colnames(test_gt) <- chr_snps$ID
 test_gt <- extract.gt(vcf_R, return.alleles = T)
-test_gt <- gsub("/", "", test_gt, fixed = T)
+test_gt <- gsub("(\\/|\\|)", "", test_gt)
 test_gt <- gsub(".", "??", test_gt, fixed = T)
 write_elai_geno(test_gt, test_file)
 

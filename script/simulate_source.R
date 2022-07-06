@@ -1,19 +1,23 @@
 #!/usr/bin/env Rscript
 
 
-mylib <- "~/R/x86_64-pc-linux-gnu-library/4.0"
+mylib <- "/shared/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
 # dir.create(mylib, showWarnings = F)
 .libPaths(mylib)
 if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
 if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+if (!requireNamespace("doParallel", quietly = TRUE)) install.packages('doParallel', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
+if (!requireNamespace("foreach", quietly = TRUE)) install.packages('foreach', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
 if (!requireNamespace("vcfR", quietly = TRUE)) install.packages('vcfR', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
 if (!requireNamespace("adegenet", quietly = TRUE)) install.packages('adegenet', repos = "https://cloud.r-project.org", dependencies = TRUE, lib = mylib, INSTALL_opts = "--no-lock")
 if (!requireNamespace("optparse", quietly = TRUE)) install.packages('optparse', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
 if (!requireNamespace("Rcpp", quietly = TRUE)) install.packages('optparse', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
 
 library(optparse, lib.loc = mylib)
-library(Rcpp)
+library(Rcpp, lib.loc = mylib)
 library(dplyr, lib.loc = mylib)
+library(doParallel, lib.loc = mylib)
+library(foreach, lib.loc = mylib)
 library(parallel, lib.loc = mylib)
 library(vcfR, lib.loc = mylib)
 library(adegenet, lib.loc = mylib)
@@ -77,6 +81,9 @@ chr_geno <- as.matrix(chr_gl)
 chr_geno[is.na(chr_geno)] <- 9
 # run snmf
 write.geno(chr_geno, geno_file)
+
+snmfProjectFile <- file.path(snmf_dir, "chr.snmfProject")
+
 chr_snmf <- snmf(geno_file, K = nb_groups,
                  CPU = cores, repetitions = 10,
                  project = "new", entropy = T, seed = 987654321)
@@ -99,11 +106,15 @@ chr_snps$ID <- paste(chr_snps$CHROM, chr_snps$POS, sep = "_")
 n_inds <- nb_genotypes
 n_snps <- nrow(chr_freq)/3
 
-mclapply(1:ncol(chr_freq), function(v) {
+#cl <- parallel::makeCluster(ncol(chr_freq))
+#doParallel::registerDoParallel(cl)
+
+for (v in 1:ncol(chr_freq)) {
   grp_elai_input <- out_files[v]
   ind_names <- paste0("group_", colnames(chr_freq)[v], "-", 1:n_inds)
   writeLines(c(n_inds, n_snps, paste(c("ID", ind_names), collapse = ",")), grp_elai_input)
   freq <- chr_freq[,v] # get allele freq of the group
+  print(n_snps)
   for (i in 1:n_snps) {
     # for locus i, frequencies of 0, 1, 2 genotype are in row 3i-2, 3i-1, 3i of freq matrix
     sml_geno <-  sample(c(0,1,2), n_inds, prob = c(freq[3*i-2], freq[3*i-1], freq[3*i]), replace = T)
@@ -112,8 +123,7 @@ mclapply(1:ncol(chr_freq), function(v) {
     geno_li <- paste(c(snp_id, sml_gt), collapse = ",")
     cat(paste0(geno_li, "\n"), file = grp_elai_input, append = T)
   }
-  return(v)
-}, mc.cores = cores, mc.preschedule = F)
+}
 
 #### improve simulation codes
 
@@ -134,12 +144,12 @@ mclapply(1:ncol(chr_freq), function(v) {
 #   return(v)
 # }, mc.cores = cores, mc.preschedule = F)
 
-mclapply(1:ncol(chr_freq), function(v) {
-  grp_elai_input <- out_files[v]
-  grp_freq <- subset(chr_freq, select = v) # get allele freq of the group
-  simul_geno(chr_freq = grp_freq, n_inds = n_inds, chr_snp = chr_snps, snp_id = chr_gl@loc.names, out_files = grp_elai_input)
-  return(v)
-}, mc.cores = cores, mc.preschedule = F)
+# mclapply(1:ncol(chr_freq), function(v) {
+#   grp_elai_input <- out_files[v]
+#   grp_freq <- subset(chr_freq, select = v) # get allele freq of the group
+#   simul_geno(chr_freq = grp_freq, n_inds = n_inds, chr_snp = chr_snps, snp_id = chr_gl@loc.names, out_files = grp_elai_input, core = 1)
+#   return(v)
+# }, mc.cores = cores, mc.preschedule = F)
 
 # calling r function in Rcpp
 # // [[Rcpp::export]]
@@ -164,15 +174,3 @@ mclapply(1:ncol(chr_freq), function(v) {
 # }
 
 
-mt <- matrix(c(1:45), 9, 5)
-mt <- mt/100
-colnames(mt) <- c("V1", "V2", "V3", "V4", "V4")
-snp_info <- data.frame(ID = c("l1", "l2", "l3"),
-                       REF = c("T", "C", "A"),
-                       ALT = c("C", "T", "G"))
-simul_geno(mt, 5, c("l1", "l2", "l3"), snp_info, c("s1", "s2", "s3", "s4", "s5"), 1)
-system.time(simul_geno(mt, 5, c("l1", "l2", "l3"), snp_info, c("s1", "s2", "s3", "s4", "s5"), 1))
-
-bench::mark(simul_geno(mt, 5, c("l1", "l2", "l3"), snp_info, c("s1", "s2", "s3", "s4", "s5"), 1),
-            simul_geno(mt, 5, c("l1", "l2", "l3"), snp_info, c("s1", "s2", "s3", "s4", "s5"), 2),
-            simul_geno(mt, 5, c("l1", "l2", "l3"), snp_info, c("s1", "s2", "s3", "s4", "s5"), 3))

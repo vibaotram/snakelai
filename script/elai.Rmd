@@ -96,6 +96,8 @@ source_param <- do.call(paste,
 test_file <- snakemake@input$test_file
 pos_dir <- dirname(snakemake@input$snp_file)
 pos_files <- list.files(pos_dir, "*.pos", full.names = T)
+even_pos_files <- file.path(dirname(pos_dir), "even/test_1.pos")
+even_pos <- fread(even_pos_files)
 unsorted <- as.numeric(gsub("test_|.pos", "", basename(pos_files)))
 sorted <- sort(unsorted)
 pos_files <- pos_files[sapply(sorted, function(i) which(unsorted == i))]
@@ -180,27 +182,26 @@ for (j in submit_elai) {
   dosage <- do.call(rbind, lapply(names(elai_res$ancestral_dosage),
                                   function(d) data.frame(elai_res$ancestral_dosage[[d]],
                                                          "individual" = d)))
-  dosage <- dosage %>% dplyr::arrange(pos)
-  for (ind in unique(rownames(adm))) {
-    adm_ind <- adm %>% dplyr::filter(individual == ind)
-    dosage_ind <- dosage %>% dplyr::filter(individual == ind)
-    if (batch == 1) {
-      cat("new")
-      fwrite(adm_ind, file.path(outdir, "overall_admixture.csv"),
-             sep = ",", row.names = T, col.names = T,
-             append = F)
-      fwrite(dosage_ind, file.path(outdir, "local_dosage.csv"),
-             sep = ",", row.names = F, col.names = T,
-             append = F)
-    } else {
-      cat("append")
-      fwrite(adm_ind, file.path(outdir, "overall_admixture.csv"),
-             sep = ",", row.names = T, col.names = F,
-             append = T)
-      fwrite(dosage_ind, file.path(outdir, "local_dosage.csv"),
-             sep = ",", row.names = F, col.names = F,
-             append = T)
-    }
+  ## for the dosage, keep only common positions between 2 snp sets (meaning only the snps on even set) to save some storage
+  dosage <- dosage %>% 
+    filter(rs %in% even_pos$V1) %>% 
+    dplyr::arrange(pos)
+  if (batch == 1) {
+    cat("new")
+    fwrite(adm, file.path(outdir, "overall_admixture.csv"),
+           sep = ",", row.names = T, col.names = T,
+           append = F)
+    fwrite(dosage, file.path(outdir, "local_dosage.csv"),
+           sep = ",", row.names = F, col.names = T,
+           append = F)
+  } else {
+    cat("append")
+    fwrite(adm, file.path(outdir, "overall_admixture.csv"),
+           sep = ",", row.names = T, col.names = F,
+           append = T)
+    fwrite(dosage, file.path(outdir, "local_dosage.csv"),
+           sep = ",", row.names = F, col.names = F,
+           append = T)
   }
 }
 ```
