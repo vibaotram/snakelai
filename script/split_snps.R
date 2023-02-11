@@ -44,14 +44,21 @@ dir.create(outdir, showWarnings = F)
 
 snp_info <- read.csv(snp_file, header = F, stringsAsFactors = F)
 colnames(snp_info) <- c("id", "pos", "chr")
+snp_info$pos <- as.numeric(snp_info$pos)
+print(length(snp_info$pos))
 
-n_snp <- myArgs$nb_snps
-size <- as.numeric(myArgs$window_size)
+n_snp <- as.character(myArgs$nb_snps)
+size <- as.character(myArgs$window_size)
 if (n_snp == "all" && size != "chrom") { # subset all snps
+  size <- as.numeric(size)
   batch <- ceiling(nrow(snp_info)/size)
-} else { # random snps
-    n_snp <- as.numeric(n_snp)
-    batch <- 1
+} else if (n_snp != "all" && size == "chrom") { # random
+  n_snp <- as.numeric(n_snp)
+  batch <- 1
+} else { # even
+  n_snp <- as.numeric(n_snp)
+  size <- as.numeric(size)
+  batch <- 1
 }
 
 # print(batch)
@@ -73,8 +80,11 @@ for (b in 1:batch) {
     }, mc.cores = cores, mc.preschedule = F) %>% unlist
     snp_batch <- snp_info %>% filter(pos %in% sample_pos)
   } else if (is.numeric(n_snp) && size == "chrom") { # random sample
-    sample_pos <- sample(n_snp, snp_info$pos, replace = F)
+    print(n_snp)
+    sample_pos <- sample(snp_info$pos, n_snp, replace = F)
+    print(length(sample_pos))
     snp_batch <- snp_info %>% filter(pos %in% sample_pos)
+    print(nrow(snp_batch))
   } else { # subset of all snps
     start <- size*(b-1) + 1
     end <- size*b

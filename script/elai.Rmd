@@ -96,14 +96,12 @@ source_param <- do.call(paste,
 test_file <- snakemake@input$test_file
 pos_dir <- dirname(snakemake@input$snp_file)
 pos_files <- list.files(pos_dir, "*.pos", full.names = T)
-even_pos_files <- file.path(dirname(pos_dir), "even/test_1.pos")
-even_pos <- fread(even_pos_files)
 unsorted <- as.numeric(gsub("test_|.pos", "", basename(pos_files)))
 sorted <- sort(unsorted)
 pos_files <- pos_files[sapply(sorted, function(i) which(unsorted == i))]
 upper_layer <- length(source_files)
 opts <- snakemake@params$options
-mem <- snakemake@params$mem_gb
+mem <- snakemake@resources$mem_gb
 
 elai <- snakemake@params$elai
 # elai <- "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
@@ -173,6 +171,8 @@ outdir <- dirname(as.character(snakemake@output))
 for (j in submit_elai) {
   elai_dir <- get_slurm_out(j, outtype = 'table', wait = T)
   print(elai_dir)
+  sacct_cmd <- paste0("sacct --format=jobname,CPUTime,MaxRSS --name ", j$jobname, " > ", file.path(outdir, "benchmark.txt"))
+  system(sacct_cmd)
   elai_dir <- as.character(elai_dir[1,])
   print(elai_dir)
   batch <- basename(elai_dir)
