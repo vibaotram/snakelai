@@ -224,12 +224,13 @@ rule elai:
         # expand(os.path.join(outdir, "elai", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_r.{elai_ext}"), chromosome= "{chromosome}", snp_selection="{snp_selection}", elai_params = "{elai_params}", elai_ext=elai_ext)
     params:
         elai = elai,
+        em_run = config["em_run"],
         options = lambda wildcards: config["elai_params"][wildcards.elai_params],
         # out_dir = lambda wildcards, output: os.path.basename(os.path.dirname(output[0])),
         workdir = os.path.join(outdir, "elai", "{chromosome}", "{snp_selection}", "{elai_params}"),
         logname = "elai_{chromosome}_{snp_selection}_{elai_params}",
         logdir = os.path.join(outdir, "log"),
-        mem_gb = config["elai_mem_gb"]
+        mem_gb = config["elai_mem_gb"],
     resources:
         mem_gb = config["elai_mem_gb"]
     # singularity: "shub://vibaotram/singularity-container:guppy4.0.14gpu-conda-api"

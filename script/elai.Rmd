@@ -109,6 +109,8 @@ mem <- snakemake@resources$mem_gb
 elai <- snakemake@params$elai
 # elai <- "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
 
+em_run <- snakemake@params$em_run
+
 all_params <- data.frame(source = source_param,
                          test = test_file,
                          pos = pos_files,
@@ -117,13 +119,14 @@ all_params <- data.frame(source = source_param,
                          elai_dir = elai_dir,
                          elai = elai)
 print(all_params)
+
 ```
 
 ```{r run_elai}
-run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, elai) {
+run_elai <- function(source, test, pos, upper_layer, other_params, elai_dir, elai, array) {
   # ini_dir <- getwd()
   batch <- gsub("test_|.pos", "", basename(as.character(pos)))
-  workdir <- file.path(elai_dir, batch)
+  workdir <- file.path(elai_dir, batch, array)
   dir.create(workdir, showWarnings = F, recursive = T)
   markfile <- list.files(workdir, "elai_r.ps21.txt", recursive = T, full.names = T)
   if (length(markfile) > 0) {
@@ -144,7 +147,7 @@ parse_jobname <- function(pos_file, logname) {
   batch <- gsub("test_|.pos", "", basename(pos_file))
   # snp_selection <- basename(dirname(pos_file))
   # chromosome <- basename(dirname(dirname(pos_file)))
-  jobname <- paste(logname, batch, sep = "_")
+  jobname <- paste("RS", logname, batch, sep = "_")
   return(jobname)
 }
 
@@ -153,10 +156,22 @@ logdir <- snakemake@params$logdir
 logfile <- file.path(logdir, "slurm", "%x_%j.log")
 
 submit_elai <- lapply(1:nrow(all_params), function(i) {
-  job_name <- parse_jobname(as.character(all_params$pos[i]), logname)
-  slurm_apply(run_elai, all_params[i,], submit = TRUE,
+  params_df <- all_params[i,]
+  job_name <- parse_jobname(as.character(params_df$pos), logname)
+  
+  if (em_run > 1) {
+    for (i in 1:em_run) params_df <- params_df %>% add_row(params_df[1,])
+  }
+  
+  params_df <- params_df %>% mutate(array = 1:nrow(params_df))
+  
+  slurm_apply(run_elai, params_df, submit = TRUE, preschedule_cores = T, 
+              nodes = em_run, cpus_per_node = 1,
               jobname = job_name, sh_template = "script/submit_elai_sh.txt",
-              slurm_options = list("output" = logfile, "error" = logfile, "mem" = paste0(mem,"G"), "partition" = "long"))
+              slurm_options = list("output" = logfile, 
+                                   "error" = logfile, 
+                                   "mem" = paste0(mem,"G"), 
+                                   "partition" = "long"))
 })
 ```
 
@@ -201,5 +216,17 @@ for (j in submit_elai) {
 ## elai parameters
 ```{r elai_params}
 snakemake@params$elai_options
+```
+
+
+```{r include=FALSE, eval=FALSE}
+aveg <- function
+test_rslurm <- slurm_apply(sample, data.frame(x = rep(10, 5), size = rep(3,5)), submit = TRUE,
+                           nodes = 4, cpus_per_node = 1,
+                           preschedule_cores = T, libPaths = "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0",
+                           jobname = "sample", sh_template = "script/submit_elai_sh.txt",
+                           slurm_options = list("output" = "slurm_%x_%a.log", "error" = "slurm_%x_%a.log", 
+                                                "partition" = "normal"))
+get_slurm_out(test_rslurm, outtype = 'table', wait = TRUE)
 ```
 

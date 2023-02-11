@@ -67,6 +67,8 @@ elai_params:
   c5_mg20: "-c 5 -mixgen 20 --exclude-nopos --exclude-miss1"
   #c5_mg10_s60: "-c 5 -mixgen 10 -s 60 --exclude-nopos --exclude-miss1"
 
+em_run: 3
+
 elai_mem_gb: 5
 
 merged_snps: ["even", "all"]
