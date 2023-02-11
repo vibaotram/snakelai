@@ -37,12 +37,12 @@ TEST_FILE = config["test_file"]
 
 ###### SPLIT SOURCE GENOTYPES BY CHROMOSOME
 
-vcf_file = config['vcf']
-source_name = os.path.splitext(os.path.splitext(os.path.basename(vcf_file))[0])[0]
+source_vcf = config['source_vcf']
+source_name = os.path.splitext(os.path.splitext(os.path.basename(source_vcf))[0])[0]
 vcftools_module = config['vcftools']
 
 chrom_id= config['chromosome']
-vcf_reader = vcf.Reader(open(vcf_file, 'r'))
+vcf_reader = vcf.Reader(open(source_vcf, 'r'))
 source_chromosome = unique_chrom(vcf_reader)
 if chrom_id == '@':
     chromosome = source_chromosome
@@ -63,7 +63,7 @@ rule finish:
         expand(os.path.join(outdir, "elai_results", "{chromosome}", "{snp_selection}", "{elai_params}", "elai_results.html"), chromosome=chromosome, snp_selection=snp_selection, elai_params=elai_params)
 
 rule split_source_chrom:
-    input: vcf_file
+    input: source_vcf
     output: os.path.join(outdir, 'source', '{chromosome}', source_name+'_{chromosome}.recode.vcf')
     params:
         logname = "split_source_chrom_{chromosome}",
@@ -97,6 +97,8 @@ rule simulate_source:
         logname = "simulate_source_{chromosome}",
         logdir = os.path.join(outdir, "log")
     threads: config['simulate_cores']
+    resources:
+        mem_gb = config["simulate_mem_gb"]
     singularity: config['singularity']
     shell:
         """
@@ -108,14 +110,20 @@ rule simulate_source:
 ######################
 #### PREPARE TEST FILE AND SNP FILE
 
-test_vcf = config['vcf']
+test_vcf = config['test_vcf']
 test_id = config['test_id']
-if TEST_FILE == "" and not all(id in vcf_reader.samples for id in test_id):
-    raise ValueError("Specified genotype IDs do not present in the test_vcf file")
 
 vcftools_indv = []
-for id in test_id:
-    vcftools_indv.append("--indv {id}".format(id=id))
+
+if test_id == "@":
+    vcftools_indv = ''
+elif TEST_FILE == "" and not all(id in vcf_reader.samples for id in test_id):
+    raise ValueError("Specified genotype IDs do not present in the test_vcf file")
+else:
+    for id in test_id:
+        vcftools_indv.append("--indv {id}".format(id=id))
+
+
 
 rule split_test_chrom:
     input: test_vcf

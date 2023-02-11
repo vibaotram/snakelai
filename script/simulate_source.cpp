@@ -9,14 +9,11 @@ using namespace std;
 // [[Rcpp::plugins(openmp)]]
 
 // [[Rcpp::export]]
-void simul_geno(NumericMatrix chr_freq, int n_inds, CharacterVector snp_id, DataFrame chr_snp, CharacterVector out_files, int core){
+void simul_geno(NumericMatrix chr_freq, int n_inds, CharacterVector snp_id, DataFrame chr_snp, CharacterVector out_files){
   Environment pkg = Environment::namespace_env("data.table");
   Function fread = pkg["fread"];
   Function geno2elai_gt("geno2elai_gt");
   
-  #if defined(_OPENMP)
-  #pragma omp parallel for num_threads(core)
-  #endif
   for (int i = 0; i < chr_freq.ncol(); ++i){ // for each source file
     String grp_elai_input(out_files[i]);
     ofstream source_input;

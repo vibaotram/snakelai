@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
 
 
-mylib <- "~/R/x86_64-pc-linux-gnu-library/4.0"
-.libPaths(mylib)
+mylib <- "/home/baotram/R/x86_64-pc-linux-gnu-library/4.0"
 # dir.create(mylib, showWarnings = F)
+.libPaths(mylib)
 
 # if (!requireNamespace("dplyr", quietly = TRUE)) install.packages('dplyr', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
 # if (!requireNamespace("parallel", quietly = TRUE)) install.packages('parallel', repos = "https://cloud.r-project.org", lib = mylib, INSTALL_opts = "--no-lock")
@@ -45,7 +45,7 @@ dir.create(outdir, showWarnings = F)
 snp_info <- read.csv(snp_file, header = F, stringsAsFactors = F)
 colnames(snp_info) <- c("id", "pos", "chr")
 
-n_snp <- myArgs$nb_snps
+n_snp <- as.numeric(myArgs$nb_snps)
 size <- as.numeric(myArgs$window_size)
 if (n_snp == "all" && size != "chrom") { # subset all snps
   batch <- ceiling(nrow(snp_info)/size)

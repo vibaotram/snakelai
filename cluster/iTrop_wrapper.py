@@ -35,8 +35,8 @@ output = f'--output {logdir}/{log}_%j.log'
 error = f'--error {logdir}/{log}_%j.log'
 
 try:
-    mem_gb = job_properties['resources']['mem_gb']
-    mem = f'--mem-per-cpu {mem_gb}G'
+    mem_gb = int(job_properties['resources']['mem_gb'])
+    mem = f'--mem {mem_gb}G'
 except (IndexError, KeyError):
     mem = ""
 
