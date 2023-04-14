@@ -7,7 +7,7 @@ singularity: "/shared/projects/vietcaf/scripts/snakelai/singularity-container_my
 ####################
 #### INPUT FILES
 
-genome: "/shared/projects/vietcaf/data/reference/CC1.8_v2_pseudomolecule_cat.fa" # reference, only used if run "Snakemake merge_elai"
+genome: "/shared/projects/vietcaf/data/reference/CC1.8_v2_pseudomolecule_cat.fa" # reference, only used if run "snakemake merge_elai"
 
 source_files: []
 test_file: "" # if filled, test_id will be ignored
@@ -27,11 +27,11 @@ outdir: "/shared/projects/elai_most/data/snakelai_out_all"
 split_snps_cores: 20
 snp_selection:
   even: # 1 snp per non-overlapping windows of 5000 bpp
-    nb_snps: 1 
-    window_size: 5000 
+    nb_snps: 1
+    window_size: 5000
   all: # all snps splitted into chunks of 100000 snps
-    nb_snps: "all" 
-    window_size: 100000 
+    nb_snps: "all"
+    window_size: 100000
 
 
 ######################
@@ -53,7 +53,6 @@ elai_mem_gb: 20
 
 #######################
 #### MERGE ELAI RESULTS
-# only works if run "Snakemake merge_elai"
+# only works if run "snakemake merge_elai"
 merged_snps: ["even", "all"]
 merged_params: "c5_mg_20"
-

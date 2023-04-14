@@ -1,5 +1,7 @@
 # Snakemake workflow to run ELAI with different parameters and SNP sets, and scripts to get average of multiple runs
 
+*Scripts here are adapted on IFB cluster. Branch 'itrop' is for scripts adapted on iTrop.*
+
 ## Run ELAI on simulated genotypes for testing (1 chromosome only)
 ### Input
 - source files, test file, and snp file in ELAI input format containing all SNPs

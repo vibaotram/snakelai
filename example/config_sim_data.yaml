@@ -7,13 +7,13 @@ singularity: "/shared/projects/vietcaf/scripts/snakelai/singularity-container_my
 
 ####################
 #### INPUT FILES
-genome: "/shared/projects/vietcaf/data/reference/CC1.8_v2_pseudomolecule_cat.fa" # reference, only used if run "Snakemake merge_elai"
+genome: "/shared/projects/vietcaf/data/reference/CC1.8_v2_pseudomolecule_cat.fa" # reference, only used if run "snakemake merge_elai"
 
 source_files: [
-"/shared/projects/elai_most/benchmark_elai/input/group_AG", 
-"/shared/projects/elai_most/benchmark_elai/input/group_C", 
-"/shared/projects/elai_most/benchmark_elai/input/group_D", 
-"/shared/projects/elai_most/benchmark_elai/input/group_ER", 
+"/shared/projects/elai_most/benchmark_elai/input/group_AG",
+"/shared/projects/elai_most/benchmark_elai/input/group_C",
+"/shared/projects/elai_most/benchmark_elai/input/group_D",
+"/shared/projects/elai_most/benchmark_elai/input/group_ER",
 "/shared/projects/elai_most/benchmark_elai/input/group_OB"
 ] # if simulate_source = FALSE, provide genotype file for each source
 test_file: "/shared/projects/elai_most/benchmark_elai/input/test_hybrid345" # if filled, test_id will be ignored
@@ -43,11 +43,11 @@ snp_selection:
     nb_snps: 100000
     window_size: "chrom"
   even: # select 1 snp per non-overlapping windows of 5000 bp
-    nb_snps: 1 
-    window_size: 5000 
+    nb_snps: 1
+    window_size: 5000
   all: # use all the snps provided, but plit them into chunks of 100k snps
-    nb_snps: "all" 
-    window_size: 100000 
+    nb_snps: "all"
+    window_size: 100000
 # nb_batches: 1 # number of snp sets to be randomly selected
 
 
@@ -82,7 +82,6 @@ elai_mem_gb: 15 # mem in Gb for each ELAI run
 
 #######################
 #### MERGE ELAI RESULTS
-# only works if run "Snakemake merge_elai"
+# only works if run "snakemake merge_elai"
 merged_snps: ["even", "all"]
 merged_params: "c5_mg_20"
-
