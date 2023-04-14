@@ -1,0 +1,88 @@
+####################
+#### SOFTWARE
+elai: "/shared/projects/vietcaf/scripts/elai/elai-lin" # "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+vcftools: "vcftools/0.1.16"
+singularity: "/shared/projects/vietcaf/scripts/snakelai/singularity-container_myr_4-0-2_rstudio_1.3.sif"
+
+
+####################
+#### INPUT FILES
+genome: "/shared/projects/vietcaf/data/reference/CC1.8_v2_pseudomolecule_cat.fa" # reference, only used if run "Snakemake merge_elai"
+
+source_files: [
+"/shared/projects/elai_most/benchmark_elai/input/group_AG", 
+"/shared/projects/elai_most/benchmark_elai/input/group_C", 
+"/shared/projects/elai_most/benchmark_elai/input/group_D", 
+"/shared/projects/elai_most/benchmark_elai/input/group_ER", 
+"/shared/projects/elai_most/benchmark_elai/input/group_OB"
+] # if simulate_source = FALSE, provide genotype file for each source
+test_file: "/shared/projects/elai_most/benchmark_elai/input/test_hybrid345" # if filled, test_id will be ignored
+snp_file: "/shared/projects/elai_most/benchmark_elai/input/snp.pos_1" # obligator if test_file is provided, columns: id, pos, chrom
+
+source_vcf: ""
+test_vcf: ""
+test_id: [] # "@" for all genotypes or specific id
+chromosome: [1] # "@" for all chromosome or specific chroms
+
+####################
+#### OUTPUT
+outdir: "/shared/projects/elai_most/benchmark_elai/snakelai_output"
+
+######################
+#### SNP SELECTION
+# random_snps: true # random or ordered
+# n_batches: 1 # only if "random" split
+# batch_size: 1000 # number of snps per batch
+# snp_den: [1, 500000] # random selection only, snp density: [nb snps, per kb]. if this object is set, batch_size will be ignored
+split_snps_cores: 20
+snp_selection:
+  10k: # select random 10k snps in the chromosome
+    nb_snps: 10000
+    window_size: "chrom"
+  100k: # select random 100k snps in the chromosome
+    nb_snps: 100000
+    window_size: "chrom"
+  even: # select 1 snp per non-overlapping windows of 5000 bp
+    nb_snps: 1 
+    window_size: 5000 
+  all: # use all the snps provided, but plit them into chunks of 100k snps
+    nb_snps: "all" 
+    window_size: 100000 
+# nb_batches: 1 # number of snp sets to be randomly selected
+
+
+######################
+#### SOURCE GENOTYPES SIMULATION
+simulate_source: FALSE # TRUE or FALSE
+nb_groups: 5 # nb of source populations
+nb_genotypes: 100 # nb of genotypes per group, only effective if simulate_source = TRUE
+simulate_cores: 10 # nb of cores for simulation, only effective if simulate_source = TRUE
+simulate_mem_gb: 10 # nb of mem usage for simulation, only effective if simulate_source = TRUE
+
+####################
+#### ELAI PARAMS
+# elai_source: "/data3/projects/vietcaf/baotram/scripts/robusta_vn/elai/elai-lin"
+
+elai_params:
+  c5_mg5: "-c 5 -mixgen 5 --exclude-nopos --exclude-miss1"
+  c5_mg10: "-c 5 -mixgen 10 --exclude-nopos --exclude-miss1"
+  c5_mg20: "-c 5 -mixgen 20 --exclude-nopos --exclude-miss1"
+  c5_mg30: "-c 5 -mixgen 30 --exclude-nopos --exclude-miss1"
+  c15_mg5: "-c 15 -mixgen 5 --exclude-nopos --exclude-miss1"
+  c15_mg10: "-c 15 -mixgen 10 --exclude-nopos --exclude-miss1"
+  c15_mg20: "-c 15 -mixgen 20 --exclude-nopos --exclude-miss1"
+  c15_mg30: "-c 15 -mixgen 30 --exclude-nopos --exclude-miss1"
+  c25_mg5: "-c 25 -mixgen 5 --exclude-nopos --exclude-miss1"
+  c25_mg10: "-c 25 -mixgen 10 --exclude-nopos --exclude-miss1"
+  c25_mg20: "-c 25 -mixgen 20 --exclude-nopos --exclude-miss1"
+  c25_mg30: "-c 25 -mixgen 30 --exclude-nopos --exclude-miss1"
+  #c5_mg10_s60: "-c 5 -mixgen 10 -s 60 --exclude-nopos --exclude-miss1"
+
+elai_mem_gb: 15 # mem in Gb for each ELAI run
+
+#######################
+#### MERGE ELAI RESULTS
+# only works if run "Snakemake merge_elai"
+merged_snps: ["even", "all"]
+merged_params: "c5_mg_20"
+
