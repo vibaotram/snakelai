@@ -31,8 +31,8 @@ Here is my [config file](./example/config_real_data.yaml).
 - generate or spit SNP sets as predefined
 - run ELAI for each set of parameters and snp sets
 - rerun ELAI by `snakemake --forcerun elai`
-- average results from ELAI runs by [custom script](./script/average_elai.sh)
-- merge results from runs of different snp sets by [custom script](./script/merge_elai.sh)
+- average results from ELAI runs by [custom script](./script/average_elai.R)
+- merge results from runs of different snp sets by [custom script](./script/merge_elai.R)
 
 Here is my [script](./example/run_validate_elai.sh) to run Snakemake.
 
