@@ -35,3 +35,7 @@ Here is my [config file](./example/config_real_data.yaml).
 - merge results from runs of different snp sets by [custom script](./script/merge_elai.sh)
 
 Here is my [script](./example/run_validate_elai.sh) to run Snakemake.
+
+## Some notes
+- the workflow runs on singularity container: shub://vibaotram/singularity-container:myr_4-0-2_rstudio_1.3.sif
+- may need to change R lib path in the [script files](./script), and install all the packages before running to prevent failure of parallel jobs
